@@ -1,0 +1,71 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+apply plugin: 'com.google.gms.google-services'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        multiDexEnabled true
+        applicationId "com.example.androiddevhelper"
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.core:core-ktx:1.0.1'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.firebase:firebase-messaging:17.6.0'
+    implementation 'com.google.firebase:firebase-firestore:18.2.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.android.support:multidex:1.0.3'
+
+    // ViewModel and LiveData
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha04'
+    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.1.0-alpha04'
+
+    //Room
+    implementation "androidx.room:room-runtime:2.1.0-alpha07"
+    kapt "androidx.room:room-compiler:2.1.0-alpha07"
+
+    //RxJava support for Room
+    implementation "androidx.room:room-rxjava2:2.1.0-alpha07"
+
+    //Rx Java
+    implementation "io.reactivex.rxjava2:rxjava:2.2.7"
+
+    //Rx Kotlin
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
+
+    //Rx Relay
+    implementation 'com.jakewharton.rxrelay2:rxrelay:2.1.0'
+
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+
+    //GSON Converter
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+
+    //Rx Call Adapter Factory
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+}
