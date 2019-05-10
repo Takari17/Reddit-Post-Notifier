@@ -3,6 +3,7 @@
           package="com.example.androiddevhelper">
 
     <application
+            android:name=".utils.App"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
@@ -18,9 +19,8 @@
         </activity>
 
         <service android:name=".data.MyService"/>
-        <receiver android:name=".data.MyService$NotificationBroadcastReceiver"/>
+        <receiver android:name=".data.MyService$MyBroadcastReceiver"/>
 
     </application>
-
 
 </manifest>

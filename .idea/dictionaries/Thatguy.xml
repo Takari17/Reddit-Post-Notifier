@@ -2,6 +2,7 @@
   <dictionary name="Thatguy">
     <words>
       <w>firestore</w>
+      <w>gson</w>
       <w>reddit</w>
     </words>
   </dictionary>

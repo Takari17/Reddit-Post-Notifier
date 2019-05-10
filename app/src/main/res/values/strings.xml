@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Android Dev Helper</string>
+    <string name="channel_name">Notification Settings</string>
+    <string name="channel_description">Edit Settings</string>
 </resources>

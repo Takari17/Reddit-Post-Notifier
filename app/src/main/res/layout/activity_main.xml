@@ -5,43 +5,36 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#585A57"
         tools:context=".ui.MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-            android:layout_height="0dp" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="8dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintVertical_bias="1.0" app:layout_constraintTop_toBottomOf="@+id/mainButton"
-            android:id="@+id/recyclerView" android:layout_width="0dp"/>
-    <Button
-            android:text="Get Post Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/mainButton" android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
-            android:layout_marginTop="164dp" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_bias="0.505" style="@style/Widget.AppCompat.Button.Colored"/>
+            android:layout_height="0dp"
+            android:id="@+id/recyclerView" android:layout_width="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/startServiceButton" android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" android:layout_marginRight="8dp" android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp" android:layout_marginBottom="8dp"/>
     <Button
             android:text="Start Service"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/seviceStartButton" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/mainButton" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toTopOf="parent" style="@style/Widget.AppCompat.Button.Colored"
-            app:layout_constraintHorizontal_bias="0.498" app:layout_constraintVertical_bias="0.28"/>
+            android:id="@+id/startServiceButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintEnd_toStartOf="@+id/serviceResetButton" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"/>
     <Button
-            android:text="ResetService"
-            android:layout_width="wrap_content"
+            android:text="Reset Service"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/serviceResetButton" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/mainButton" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/seviceStartButton"
-            style="@style/Widget.AppCompat.Button.Colored"/>
+            android:id="@+id/serviceResetButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_marginTop="8dp" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp" app:layout_constraintStart_toEndOf="@+id/startServiceButton"
+            app:layout_constraintHorizontal_bias="0.5"
+    />
 </androidx.constraintlayout.widget.ConstraintLayout>

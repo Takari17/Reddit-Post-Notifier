@@ -22,13 +22,11 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
-        viewModel.getNewRedditPostList().observe(this, Observer { newRedditPost ->
-            if (!recyclerViewCreated) initRecyclerView(newRedditPost) else updateNewRedditPost(newRedditPost)
+        viewModel.newRedditPostList.observe(this, Observer { newRedditPostList ->
+            if (!recyclerViewCreated) initRecyclerView(newRedditPostList) else updateNewRedditPost(newRedditPostList)
         })
 
-//        mainButton.setOnClickListener { viewModel.getAllNewRedditPost() }
-
-        seviceStartButton.setOnClickListener { viewModel.startService() }
+        startServiceButton.setOnClickListener { viewModel.startService() }
 
         serviceResetButton.setOnClickListener { viewModel.resetService() }
     }
@@ -49,16 +47,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateNewRedditPost(recentPost: List<NewRedditPost>){
         adapter.updateNewRedditPost(recentPost)
+        adapter.notifyDataSetChanged() //todo I belive we can be more specific about where we insert the values, doing so makes for performance I think
     }
 
 
     override fun onStart() {
         super.onStart()
-        viewModel.setPreviousRedditPost()
+        viewModel.bindToService()
     }
 
     override fun onStop() {
         super.onStop()
-        viewModel.savePreviousRedditPost()
+        viewModel.unbindFromService()
     }
 }

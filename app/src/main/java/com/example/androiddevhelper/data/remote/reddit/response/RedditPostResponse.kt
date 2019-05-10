@@ -1,5 +1,7 @@
 package com.example.androiddevhelper.data.remote.reddit.response
 
+import com.google.gson.annotations.SerializedName
+
 
 data class RedditPostResponse(val `data`: Data)
 
@@ -20,9 +22,10 @@ data class NewRedditPost(val `data`: PostData){
 Todo: Create a new branch and try to directly return the Post Data instead of the NewRedditPost
  */
 data class PostData(
-    var documentId: String, // Auto generated ID fire base uses, need to keep track of this to prevent creating duplicates on each network call
     val author: String,
-    val title: String
+    val title: String,
+    @SerializedName("permalink")
+    val api: String //todo want to find the proper name for this
 ) {
     constructor() : this("", "", "")
 }

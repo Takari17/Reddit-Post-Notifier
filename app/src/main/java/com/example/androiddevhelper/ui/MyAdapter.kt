@@ -9,7 +9,11 @@ import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.remote.reddit.response.NewRedditPost
 import kotlinx.android.synthetic.main.new_reddit_post_layout.view.*
 
+/*
+todo want it so our recycler view is restored on start
 
+todo I want our recycler view to always be visisble, even if there aren't any values
+ */
 class MyAdapter(private var newRedditPost: List<NewRedditPost>) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -24,7 +28,7 @@ class MyAdapter(private var newRedditPost: List<NewRedditPost>) : RecyclerView.A
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val title: TextView = itemView.textViewTitle
+        val title: TextView = itemView.titleTextView
     }
 
     fun updateNewRedditPost(recentPost: List<NewRedditPost>){
