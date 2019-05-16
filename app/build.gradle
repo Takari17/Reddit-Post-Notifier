@@ -38,6 +38,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.firebase:firebase-firestore:19.0.0'
+    implementation 'androidx.preference:preference:1.1.0-alpha05'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
@@ -53,7 +54,7 @@ dependencies {
     implementation "androidx.room:room-runtime:2.1.0-beta01"
     kapt "androidx.room:room-compiler:2.1.0-beta01"
 
-    //RxJava support for Room
+    //Rx Java support for Room
     implementation "androidx.room:room-rxjava2:2.1.0-beta01"
 
     //Rx Java
@@ -73,4 +74,14 @@ dependencies {
 
     //Rx Call Adapter Factory
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+
+    //Dagger 2
+    implementation 'com.google.dagger:dagger:2.22.1'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.22.1'
+    kapt 'com.google.dagger:dagger-android-processor:2.15'
+    kapt 'com.google.dagger:dagger-compiler:2.22.1'
+
+    //Fragment KTX
+    implementation 'androidx.fragment:fragment-ktx:1.1.0-alpha08'
+    implementation 'androidx.activity:activity-ktx:1.0.0-alpha08'
 }

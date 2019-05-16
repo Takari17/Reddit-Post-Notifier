@@ -1,24 +1,24 @@
 package com.example.androiddevhelper.data.local
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.androiddevhelper.data.remote.reddit.response.NewRedditPost
 import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.Observable
 
-/*
-Methods that will interact with the database
- */
 @Dao
 interface Dao {
 
     @Insert
-    fun insertPreviousRedditPost(previousRedditPost: DbData): Completable
+    fun insertPostData(postData: PostData): Completable
 
-//    @Query("SELECT previousRedditPost FROM data_table")
-//    fun getPreviousRedditPost(): Single<List<NewRedditPost>>
+    @Query("SELECT * FROM post_data_table  ORDER BY id asc") // asc = ascending
+    fun getAllPostData(): Observable<List<PostData>>
 
-    @Query("DELETE FROM data_table")
+    @Query("DELETE FROM post_data_table")
     fun deleteAll(): Completable
+
+    @Query("DELETE FROM post_data_table WHERE title ==:titleString ")
+    fun deleteItem(titleString: String): Completable
 }

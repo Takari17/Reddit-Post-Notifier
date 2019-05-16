@@ -3,14 +3,22 @@
           package="com.example.androiddevhelper">
 
     <application
-            android:name=".utils.App"
+            android:name=".injection.App"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".ui.MainActivity">
+        <activity
+                android:name=".ui.activity.SettingsActivity"
+                android:label="@string/title_activity_settings"
+                android:parentActivityName=".ui.activity.MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.example.androiddevhelper.ui.activity.MainActivity"/>
+        </activity>
+        <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -18,9 +26,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".data.MyService"/>
-        <receiver android:name=".data.MyService$MyBroadcastReceiver"/>
+        <service android:name=".data.service.MainService"/>
 
+        <receiver android:name=".data.service.MainService$MyBroadcastReceiver"/>
     </application>
 
 </manifest>

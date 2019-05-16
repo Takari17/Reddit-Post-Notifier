@@ -1,0 +1,22 @@
+<androidx.preference.PreferenceScreen
+        xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+
+    <PreferenceCategory
+            app:title="Notification Settings">
+
+        <SwitchPreferenceCompat
+                app:key="vibrate"
+                app:title="Vibrate"
+                app:summaryOn="On"
+                app:summaryOff="Vibrate when a new notification pops up"/>
+
+        <SwitchPreferenceCompat
+                app:key="sound"
+                app:title="Notification Sound"
+                app:summaryOn="On"
+                app:summaryOff="Play a sound when a new notification pops up"/>
+
+    </PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>
