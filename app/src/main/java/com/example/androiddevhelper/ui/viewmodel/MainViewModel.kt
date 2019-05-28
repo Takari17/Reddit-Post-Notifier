@@ -40,6 +40,5 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.clear()
-        repository.clearCompositeDisposable()
     }
 }

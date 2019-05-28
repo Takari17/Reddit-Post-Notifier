@@ -10,7 +10,7 @@ import androidx.preference.PreferenceFragmentCompat
 /*
 Higher Order Function that takes a view model and instantiates it
  */
-inline fun <reified T : ViewModel> PreferenceFragmentCompat.preferenceViewModel(
+inline fun <reified T : ViewModel> PreferenceFragmentCompat.injectViewModel(
     crossinline provider: () -> T
 ) = viewModels<T> {
     object : ViewModelProvider.Factory {

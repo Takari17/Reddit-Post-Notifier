@@ -4,10 +4,14 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
+import com.example.androiddevhelper.ui.adapters.MyAdapter.MainViewHolder
 import com.example.androiddevhelper.utils.openRedditPost
 import kotlinx.android.synthetic.main.new_reddit_post_layout.view.*
 import javax.inject.Inject
@@ -19,28 +23,15 @@ import javax.inject.Inject
 
 class MyAdapter @Inject constructor(
     private val context: Context
-) : RecyclerView.Adapter<MyAdapter.MainViewHolder>() {
-
-    var newPostDataList = emptyList<PostData>().toMutableList()
+) : ListAdapter<PostData, MainViewHolder>(CustomDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.new_reddit_post_layout, parent, false)
         return MainViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return if (newPostDataList.isEmpty())
-            1
-        else
-            newPostDataList.size
-    }
-
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
-        if (newPostDataList.isEmpty()) {
-            holder.title.text = "No New Post"
-        } else {
-            holder.title.text = newPostDataList[position].title
-        }
+            holder.title.text = getItem(position).title
     }
 
     inner class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -48,13 +39,23 @@ class MyAdapter @Inject constructor(
 
         init {
             itemView.setOnClickListener {
-                val api = newPostDataList[adapterPosition].api
+                val api = getItem(adapterPosition).api
                 openRedditPost(context, api)
             }
         }
     }
 
-    fun updateNewRedditPost(newPostData: List<PostData>) {
-        newPostDataList = newPostData.toMutableList()
+    fun updateList(newPostData: List<PostData>) = submitList(newPostData)
+
+    fun fetchItem(position: Int): PostData? = getItem(position)
+}
+
+class CustomDiffCallback : DiffUtil.ItemCallback<PostData>() {
+    override fun areItemsTheSame(oldItem: PostData, newItem: PostData): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: PostData, newItem: PostData): Boolean {
+        return oldItem == newItem
     }
 }

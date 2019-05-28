@@ -25,7 +25,6 @@ class Repository @Inject constructor(
 ) {
 
     private val serviceIntent = Intent(context, MainService::class.java)
-    private val compositeDisposable = CompositeDisposable()
 
     fun saveListToFireStore(previousRedditPost: List<NewRedditPost>) {
         if (previousRedditPost.isNotEmpty()) fireStoreDb.saveListToDb(previousRedditPost)
@@ -33,7 +32,6 @@ class Repository @Inject constructor(
 
     //Fire Store query
     fun getPreviousRedditPost() = fireStoreDb.getListFromDb()
-
 
     //Local Db Methods
     fun insertPostDataToLocalDb(postData: PostData): Disposable =
@@ -47,21 +45,13 @@ class Repository @Inject constructor(
         localDb.getAllPostData()
             .subscribeOn(Schedulers.io())
 
-    fun deleteLocalDbData(): Disposable =
-        localDb.deleteAll()
-            .subscribeOn(Schedulers.io())
-            .subscribe()
-
-    //Deletes the specific item from our local db that matches the value passed
+    //Deletes the specific item from the local db that matches the value passed
     fun deleteItem(titleString: String): Disposable =
         localDb.deleteItem(titleString)
             .subscribeOn(Schedulers.io())
             .doOnComplete { Log.d("zwi", "Item deleted from db") }
             .subscribe()
 
-
-    //Cleared from ViewModel's onClear callback
-    fun clearCompositeDisposable() = compositeDisposable.clear()
 
     fun startService() {
         if (!isServiceRunning) context.startService(serviceIntent)

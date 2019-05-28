@@ -12,9 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
-import com.example.androiddevhelper.injection.injectViewModel
 import com.example.androiddevhelper.injection.App.Companion.applicationComponent
+import com.example.androiddevhelper.injection.injectViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         initRecyclerView()
         addSwipeToDelete()
+
 
         viewModel.getNewPostDataList()
             .observe(this, Observer { newPostDataList -> updateNewRedditPost(newPostDataList) })
@@ -56,19 +58,19 @@ class MainActivity : AppCompatActivity() {
                 target: RecyclerView.ViewHolder
             ): Boolean = false
 
+            //Will delete the item swiped from the local db if not empty
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                //Will delete the item swiped from the local db if not empty
-                if (myAdapter.newPostDataList.isNotEmpty()) {
-                    viewModel.deleteItem(myAdapter.newPostDataList[viewHolder.adapterPosition].title)
+
+                myAdapter.fetchItem(viewHolder.adapterPosition)?.let { clickedItem ->
+                    viewModel.deleteItem(clickedItem.title)
                 }
+
             }
         }).attachToRecyclerView(recyclerView)
     }
 
-    private fun updateNewRedditPost(newPostDataList: List<PostData>) {
-        myAdapter.updateNewRedditPost(newPostDataList)
-        myAdapter.notifyDataSetChanged()
-    }
+    private fun updateNewRedditPost(newPostDataList: List<PostData>) =
+        myAdapter.updateList(newPostDataList)
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -78,8 +80,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        Intent(this, SettingsActivity::class.java).also { intent ->
-            startActivity(intent)
+        Intent(this, SettingsActivity::class.java).also { settingsIntent ->
+            startActivity(settingsIntent)
         }
         return true
     }
