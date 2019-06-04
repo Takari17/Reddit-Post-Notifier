@@ -1,6 +1,5 @@
 package com.example.androiddevhelper.ui.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         initRecyclerView()
         addSwipeToDelete()
 
-
+        //Observes local db, when changed the recycler view updates.
         viewModel.getNewPostDataList()
             .observe(this, Observer { newPostDataList -> updateNewRedditPost(newPostDataList) })
 
@@ -50,15 +49,14 @@ class MainActivity : AppCompatActivity() {
     private fun addSwipeToDelete() {
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             0,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT // only can swipe right or left
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT //Only can swipe right or left
         ) {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
-            ): Boolean = false
+            ): Boolean = false //Don't need this callback
 
-            //Will delete the item swiped from the local db if not empty
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
                 myAdapter.fetchItem(viewHolder.adapterPosition)?.let { clickedItem ->
@@ -74,15 +72,12 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = MenuInflater(this)
-        inflater.inflate(R.menu.my_menu, menu)
+        MenuInflater(this).inflate(R.menu.my_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        Intent(this, SettingsActivity::class.java).also { settingsIntent ->
-            startActivity(settingsIntent)
-        }
+        startActivity(SettingsActivity.createIntent(this))
         return true
     }
 }
