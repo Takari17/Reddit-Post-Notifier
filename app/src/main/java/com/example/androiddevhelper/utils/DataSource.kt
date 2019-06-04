@@ -1,6 +1,8 @@
 package com.example.androiddevhelper.utils
 
-
+/*
+Holds all constants used throughout the code base.
+ */
 const val BASE_URL = "https://www.reddit.com"
 const val API = "https://www.reddit.com/r/androiddev/new/.json"
 const val NOTIFICATION_ID = 17
