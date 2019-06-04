@@ -24,11 +24,8 @@ class Repository @Inject constructor(
     private val localDb: Dao
 ) {
 
-    private val serviceIntent = Intent(context, MainService::class.java)
-
-    fun saveListToFireStore(previousRedditPost: List<NewRedditPost>) {
-        if (previousRedditPost.isNotEmpty()) fireStoreDb.saveListToDb(previousRedditPost)
-    }
+    fun saveListToFireStore(previousRedditPost: List<NewRedditPost>) =
+        fireStoreDb.saveListToDb(previousRedditPost)
 
     //Fire Store query
     fun getPreviousRedditPost() = fireStoreDb.getListFromDb()
@@ -37,7 +34,6 @@ class Repository @Inject constructor(
     fun insertPostDataToLocalDb(postData: PostData): Disposable =
         localDb.insertPostData(postData)
             .subscribeOn(Schedulers.io())
-            .doOnComplete { Log.d("zwi", "Post inserted into local db") }
             .subscribe()
 
     //Observes any changes made to our local data base
@@ -49,15 +45,14 @@ class Repository @Inject constructor(
     fun deleteItem(titleString: String): Disposable =
         localDb.deleteItem(titleString)
             .subscribeOn(Schedulers.io())
-            .doOnComplete { Log.d("zwi", "Item deleted from db") }
             .subscribe()
 
 
     fun startService() {
-        if (!isServiceRunning) context.startService(serviceIntent)
+        if (!isServiceRunning) context.startService(MainService.createIntent(context))
     }
 
     fun resetService() {
-        if (isServiceRunning) context.stopService(serviceIntent)
+        if (isServiceRunning) context.stopService(MainService.createIntent(context))
     }
 }

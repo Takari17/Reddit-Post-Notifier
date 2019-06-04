@@ -6,16 +6,15 @@ import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.androiddevhelper.App
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
 import com.example.androiddevhelper.data.remote.PreviousRedditPost
 import com.example.androiddevhelper.data.remote.reddit.NewRedditPost
-import com.example.androiddevhelper.injection.App
 import com.example.androiddevhelper.ui.activity.MainActivity
 import com.example.androiddevhelper.utils.*
 import io.reactivex.Observable
@@ -24,7 +23,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
-import org.w3c.dom.Comment
 import java.util.concurrent.TimeUnit
 
 var isServiceRunning = false
@@ -35,6 +33,12 @@ var isServiceRunning = false
  *clicked it will bring the user to reddit and open the clicked post.
  */
 class MainService : Service() {
+
+    companion object {
+        fun createIntent(context: Context) =
+            Intent(context, MainService::class.java)
+
+    }
 
     private val injector = App.applicationComponent
 
@@ -47,6 +51,7 @@ class MainService : Service() {
     //Used for filtering our duplicates, we compare the new network call data to this
     private var previousRedditPost: List<NewRedditPost> = emptyList()
 
+    //todo use by lazy for pending intents for immutability
     private lateinit var mainContentIntent: PendingIntent
     private lateinit var postContentIntent: PendingIntent
 
@@ -103,7 +108,7 @@ class MainService : Service() {
                 onComplete = {
                     //This is so it can compare the next network call
                     previousRedditPost = newPostList.also {
-                        saveListFireStore(previousRedditPost)
+                        if (previousRedditPost.isNotEmpty()) saveListFireStore(previousRedditPost)
                     }
                 },
                 onError = { e -> Log.d("zwi", "Error filtering out duplicates: $e") }
@@ -141,7 +146,6 @@ class MainService : Service() {
             setGroup(CUSTOM_GROUP_ID)
             setCategory(NotificationCompat.CATEGORY_MESSAGE)
             setColorized(true)
-            color = Color.GREEN
             setContentIntent(mainContentIntent)
         }.build()
     }
@@ -158,15 +162,14 @@ class MainService : Service() {
     }
 
     //Creates a new pending intent with it's action set to the reddit post url (for onClick functionality)
-    private fun createNewPostPendingIntent(actionUrl: String): PendingIntent {
-        return Intent(this, MyBroadcastReceiver::class.java).apply {
+    private fun createNewPostPendingIntent(actionUrl: String): PendingIntent =
+        Intent(this, MyBroadcastReceiver::class.java).apply {
             action = actionUrl
         }.let { broadcastIntent ->
             PendingIntent.getBroadcast(
                 this, 0, broadcastIntent, 0
             )
         }
-    }
 
     //When the main foreground notification is clicked it will bring the user to the main activity
     private fun createActivityPendingIntent(): PendingIntent {
