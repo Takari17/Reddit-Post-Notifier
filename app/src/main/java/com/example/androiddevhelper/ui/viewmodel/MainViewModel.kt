@@ -17,13 +17,8 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     private val compositeDisposable = CompositeDisposable()
     private val newPostDataList = MutableLiveData<List<PostData>>()
 
+    // Observes the data from the local db(Room) and updates the Live Data when there's any change
     init {
-        observeAllPostData()
-    }
-
-    fun getNewPostDataList(): LiveData<List<PostData>> = newPostDataList
-
-    private fun observeAllPostData() {
         compositeDisposable += repository.observeAllPostData()
             .subscribeBy(
                 onNext = { postDataList -> newPostDataList.postValue(postDataList) },
@@ -31,11 +26,13 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
             )
     }
 
-    fun deleteItem(titleString: String) = repository.deleteItem(titleString)
-
     fun startService() = repository.startService()
 
     fun resetService() = repository.resetService()
+
+    fun getNewPostDataList(): LiveData<List<PostData>> = newPostDataList
+
+    fun deleteItem(titleString: String) = repository.deleteItem(titleString)
 
     override fun onCleared() {
         super.onCleared()
