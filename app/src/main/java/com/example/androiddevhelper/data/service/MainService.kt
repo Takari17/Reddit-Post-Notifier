@@ -51,19 +51,31 @@ class MainService : Service() {
     //Increments with every new notification
     private var notificationId = 10126
 
-    private fun createNewNotification(newPost: PostData) =
-        NotificationManagerCompat.from(this).apply {
 
-            notify(
-                notificationId, sharedPrefs.getNewPostNotification(
-                    newPost.title,
-                    newPost.description,
-                    createNewPostPendingIntent(newPost.api)
-                )
-            )
-            notificationId++
-        }
+    override fun onCreate() {
+        super.onCreate()
+        startNetworkCallInterval()
 
+        restoreListData()
+
+        isRunning = true
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground(NOTIFICATION_ID, createMainNotification())
+        return START_STICKY
+    }
+
+
+    //Makes a network call every minute to Reddit's API
+    private fun startNetworkCallInterval() {
+        compositeDisposable += Observable.interval(1, TimeUnit.MINUTES)
+            .map { getAllNewRedditPost() }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
+    }
 
     /*
   Look at this monster.....what have I done xD
@@ -73,7 +85,6 @@ class MainService : Service() {
     private fun getAllNewRedditPost() {
         //Not a Single anymore so we have to dispose ;<
         compositeDisposable += redditApi.getAllPostData()
-            .subscribeOn(Schedulers.io())
             .map { it.data.children }
             .flatMap { newPostList ->
                 Observable.fromIterable(newPostList)
@@ -95,23 +106,19 @@ class MainService : Service() {
             )
     }
 
+    private fun createNewNotification(newPost: PostData) =
+        NotificationManagerCompat.from(this).apply {
 
-    override fun onCreate() {
-        super.onCreate()
-        startNetworkCallInterval()
+            notify(
+                notificationId, sharedPrefs.getNewPostNotification(
+                    newPost.title,
+                    newPost.description,
+                    createNewPostPendingIntent(newPost.api)
+                )
+            )
+            notificationId++
+        }
 
-        //Comment this out for testing
-        restoreListData()
-
-        isRunning = true
-    }
-
-    override fun onBind(intent: Intent?): IBinder? = null
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOTIFICATION_ID, createMainNotification())
-        return START_STICKY
-    }
 
     //Notification given to the foreground service, needs special attributes to host the group of new notifications
     private fun createMainNotification(): Notification =
@@ -128,35 +135,17 @@ class MainService : Service() {
         }.build()
 
 
-    /*
-    Makes a network call every minute, filters out the duplicate post, then prompts the
-    user with a notification for every new distinct post
-    */
-    private fun startNetworkCallInterval() {
-        compositeDisposable += Observable.interval(1, TimeUnit.MINUTES)
-            .map { getAllNewRedditPost() }
-            .subscribeOn(Schedulers.io())
-            .subscribe()
-    }
-
     //Creates a new pending intent with it's action set to the reddit post url (for onClick functionality)
     private fun createNewPostPendingIntent(url: String): PendingIntent =
-        Intent(this, MyBroadcastReceiver::class.java).apply {
-            action = url
-        }.let { broadcastIntent ->
-            PendingIntent.getBroadcast(
-                this, 0, broadcastIntent, 0
-            )
-        }
+        PendingIntent.getBroadcast(
+            this, 0, MainBroadcastReceiver.createIntent(this, url), 0
+        )
 
-    //When the main foreground notification is clicked it will bring the user to the main activity
-    private fun createActivityPendingIntent(): PendingIntent {
-        return Intent(this, MainActivity::class.java).let { activityIntent ->
-            PendingIntent.getActivity(
-                this, 0, activityIntent, 0
-            )
-        }
-    }
+    private fun createActivityPendingIntent(): PendingIntent =
+        PendingIntent.getActivity(
+            this, 0, MainActivity.createIntent(this), 0
+        )
+
 
     private fun saveListFireStore(previousRedditPost: List<NewRedditPost>) =
         repository.saveListToFireStore(previousRedditPost)
@@ -183,7 +172,14 @@ class MainService : Service() {
     }
 
     // Receives click events from any new post notification and opens the URL for that post
-    class MyBroadcastReceiver : BroadcastReceiver() {
+    class MainBroadcastReceiver : BroadcastReceiver() {
+
+        companion object {
+            fun createIntent(context: Context, action: String? = null) =
+                Intent(context, MainBroadcastReceiver::class.java).apply {
+                    this.action = action
+                }
+        }
 
         override fun onReceive(context: Context, intent: Intent) {
             val api = intent.action

@@ -1,5 +1,7 @@
 package com.example.androiddevhelper.ui.activity
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -9,14 +11,19 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.androiddevhelper.App.Companion.applicationComponent
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
-import com.example.androiddevhelper.injection.App.Companion.applicationComponent
-import com.example.androiddevhelper.injection.injectViewModel
+import com.example.androiddevhelper.utils.injectViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        fun createIntent(context: Context) =
+            Intent(context, MainActivity::class.java)
+    }
 
     private val injector = applicationComponent
     private val viewModel by injectViewModel { injector.mainViewModel }
