@@ -1,5 +1,7 @@
 package com.example.androiddevhelper.ui.activity
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -11,6 +13,11 @@ import com.example.androiddevhelper.injection.App
 import com.example.androiddevhelper.injection.injectViewModel
 
 class SettingsActivity : AppCompatActivity() {
+
+    companion object{
+        fun createIntent(context: Context) =
+                Intent(context, SettingsActivity::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,20 +33,20 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
 
         //Don't want to inject into view model since these are views
-        private var vibrate: SwitchPreferenceCompat? = findPreference("vibrate")
-        private var sound: SwitchPreferenceCompat? = findPreference("sound")
-        private val settingsVm by injectViewModel { App.applicationComponent.settingsViewModel }
+        private val vibrate: SwitchPreferenceCompat? = findPreference("vibrate")
+        private val sound: SwitchPreferenceCompat? = findPreference("sound")
+        private val viewModel by injectViewModel { App.applicationComponent.settingsViewModel }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-            //Will enable/disable the other preference on click so both is never active at the same time
+            //When one preference is clicked the other gets disabled
             vibrate?.setOnPreferenceClickListener {
-                sound?.isEnabled = !settingsVm.sharedPrefs.vibrate()
-                true
+                sound?.isEnabled = !viewModel.sharedPrefs.vibrate() // disabled
+                true // enables the vibrate preference
             }
             sound?.setOnPreferenceClickListener {
-                vibrate?.isEnabled = !settingsVm.sharedPrefs.sound()
+                vibrate?.isEnabled = !viewModel.sharedPrefs.sound() // disabled
                 true
             }
         }
