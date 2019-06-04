@@ -25,9 +25,7 @@ import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
-var isServiceRunning = false
-
-/**
+/*
  *When created the service will make a network call every minute, and if they'res any
  *new reddit post it will prompt the user with a notification. When the notification is
  *clicked it will bring the user to reddit and open the clicked post.
@@ -35,97 +33,77 @@ var isServiceRunning = false
 class MainService : Service() {
 
     companion object {
+        var isRunning = false
+
         fun createIntent(context: Context) =
             Intent(context, MainService::class.java)
-
     }
 
     private val injector = App.applicationComponent
-
     private val repository = injector.repository
     private val redditApi = injector.redditApi
     private val sharedPrefs = injector.sharedPrefs
-
     private val compositeDisposable = CompositeDisposable()
 
     //Used for filtering our duplicates, we compare the new network call data to this
     private var previousRedditPost: List<NewRedditPost> = emptyList()
 
-    //todo use by lazy for pending intents for immutability
-    private lateinit var mainContentIntent: PendingIntent
-    private lateinit var postContentIntent: PendingIntent
+    //Increments with every new notification
+    private var notificationId = 10126
 
-    //Notification id which increments with every new notification for distinct id's
-    private var id = 10126
-
-    private fun createNewNotification(newPost: PostData) {
-
+    private fun createNewNotification(newPost: PostData) =
         NotificationManagerCompat.from(this).apply {
 
-            postContentIntent = createNewPostPendingIntent(newPost.api)
-
-            notify(id, sharedPrefs.getNewPostNotification(newPost.title, newPost.description, postContentIntent))
-
-            id++
-        }
-    }
-
-
-    private fun executeNetworkCall() = redditApi.getAllPostData()
-
-    private fun getAllNewRedditPost() {
-        //No need to dispose a Single :D
-        executeNetworkCall()
-            .subscribeOn(Schedulers.io())
-            .map { it.data.children }
-            .subscribeBy(
-                onSuccess = { list -> filterOutDuplicates(list) },
-                onError = { Log.d("zwi", "Failed executing network call in getAllNewRedditPost(), error: $it") }
+            notify(
+                notificationId, sharedPrefs.getNewPostNotification(
+                    newPost.title,
+                    newPost.description,
+                    createNewPostPendingIntent(newPost.api)
+                )
             )
-    }
+            notificationId++
+        }
+
 
     /*
-    Look at this monster.....what have I done xD
-    This method takes the data fetched from r/AndroidDev and filters out the duplicate post by comparing
-    the new data to the previous data fetched. It then applies a delay of 2 seconds between emissions
-    so it's less jarring for the user if there's multiple new post
-     */
-    private fun filterOutDuplicates(newPostList: List<NewRedditPost>) {
-        Observable.fromIterable(newPostList)
+  Look at this monster.....what have I done xD
+  This method takes the data fetched from r/AndroidDev and filters out the duplicate and applies a delay of 2 seconds between emissions
+  so it's less jarring for the user if there's multiple new post.
+   */
+    private fun getAllNewRedditPost() {
+        //Not a Single anymore so we have to dispose ;<
+        compositeDisposable += redditApi.getAllPostData()
             .subscribeOn(Schedulers.io())
-            .filter { individualPost ->
-                if (previousRedditPost.isEmpty()) true // all items pass the filter
-                else individualPost !in previousRedditPost //  compares new network call data to the one previously made, then emits any new values
-            }
-            .zipWith(Observable.interval(2, TimeUnit.SECONDS)) //Delay of 2 seconds for every new notification
-            .map { pair -> pair.first.data }
-            .subscribeBy(
-                onNext = { individualPost ->
-                    createNewNotification(individualPost)
-                    repository.insertPostDataToLocalDb(individualPost)
-                },
-
-                onComplete = {
-                    //This is so it can compare the next network call
-                    previousRedditPost = newPostList.also {
+            .map { it.data.children }
+            .flatMap { newPostList ->
+                Observable.fromIterable(newPostList)
+                    .filter { newPost -> newPost !in previousRedditPost }
+                    .map {
+                        previousRedditPost = newPostList
                         if (previousRedditPost.isNotEmpty()) saveListFireStore(previousRedditPost)
+                        it
                     }
+                    .zipWith(Observable.interval(2, TimeUnit.SECONDS))
+                    .map { pair -> pair.first.data }
+            }
+            .subscribeBy(
+                onNext = { newPost ->
+                    createNewNotification(newPost)
+                    repository.insertPostDataToLocalDb(newPost)
                 },
                 onError = { e -> Log.d("zwi", "Error filtering out duplicates: $e") }
             )
     }
 
+
     override fun onCreate() {
         super.onCreate()
         startNetworkCallInterval()
 
-        mainContentIntent = createActivityPendingIntent()
-        postContentIntent = createNewPostPendingIntent(NOTIF_CLICK)
-
         //Comment this out for testing
         restoreListData()
 
-        isServiceRunning = true
+        isRunning = true
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -136,9 +114,9 @@ class MainService : Service() {
     }
 
     //Notification given to the foreground service, needs special attributes to host the group of new notifications
-    private fun createMainNotification(): Notification {
+    private fun createMainNotification(): Notification =
 
-        return NotificationCompat.Builder(this, CHANNEL_ID).apply {
+        NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setSmallIcon(R.drawable.white_icon)
             setContentTitle("Android Dev Helper!")
             setContentText("Waiting For New Reddit Post...")
@@ -146,9 +124,8 @@ class MainService : Service() {
             setGroup(CUSTOM_GROUP_ID)
             setCategory(NotificationCompat.CATEGORY_MESSAGE)
             setColorized(true)
-            setContentIntent(mainContentIntent)
+            setContentIntent(createActivityPendingIntent())
         }.build()
-    }
 
 
     /*
@@ -158,13 +135,14 @@ class MainService : Service() {
     private fun startNetworkCallInterval() {
         compositeDisposable += Observable.interval(1, TimeUnit.MINUTES)
             .map { getAllNewRedditPost() }
+            .subscribeOn(Schedulers.io())
             .subscribe()
     }
 
     //Creates a new pending intent with it's action set to the reddit post url (for onClick functionality)
-    private fun createNewPostPendingIntent(actionUrl: String): PendingIntent =
+    private fun createNewPostPendingIntent(url: String): PendingIntent =
         Intent(this, MyBroadcastReceiver::class.java).apply {
-            action = actionUrl
+            action = url
         }.let { broadcastIntent ->
             PendingIntent.getBroadcast(
                 this, 0, broadcastIntent, 0
@@ -180,10 +158,9 @@ class MainService : Service() {
         }
     }
 
-    //Saves the previousRedditPost list to firestore, restored on service create
-    private fun saveListFireStore(previousRedditPost: List<NewRedditPost>) {
+    private fun saveListFireStore(previousRedditPost: List<NewRedditPost>) =
         repository.saveListToFireStore(previousRedditPost)
-    }
+
 
     //Pulls the saved list from firestore and sets it to the previousRedditPost list, method takes 2-3 seconds to finish
     private fun restoreListData() {
@@ -202,7 +179,7 @@ class MainService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.clear()
-        isServiceRunning = false
+        isRunning = false
     }
 
     // Receives click events from any new post notification and opens the URL for that post
