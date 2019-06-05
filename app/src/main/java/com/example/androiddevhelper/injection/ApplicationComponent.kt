@@ -19,7 +19,6 @@ interface ApplicationComponent {
     val mainViewModel: MainViewModel
     val settingsViewModel: SettingsViewModel
     val repository: Repository
-    val myAdapter: MyAdapter
 
     @Component.Factory
     interface Factory {

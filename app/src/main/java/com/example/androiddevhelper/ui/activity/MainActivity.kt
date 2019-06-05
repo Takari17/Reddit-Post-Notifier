@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddevhelper.App.Companion.applicationComponent
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
+import com.example.androiddevhelper.ui.adapters.MyAdapter
 import com.example.androiddevhelper.utils.injectViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -27,7 +28,15 @@ class MainActivity : AppCompatActivity() {
 
     private val injector = applicationComponent
     private val viewModel by injectViewModel { injector.mainViewModel }
-    private val myAdapter = injector.myAdapter
+
+    //Deletes item when clicked
+    private val myAdapter: MyAdapter by lazy {
+        MyAdapter(this) { position ->
+            myAdapter.fetchItem(position)?.let { item ->
+                viewModel.deleteItem(item.title)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

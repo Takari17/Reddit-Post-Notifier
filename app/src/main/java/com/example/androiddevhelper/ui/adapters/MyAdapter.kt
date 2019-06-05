@@ -21,7 +21,8 @@ import javax.inject.Inject
  */
 
 class MyAdapter @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val itemClick: (Int) ->  Unit
 ) : ListAdapter<PostData, MainViewHolder>(CustomDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
@@ -40,6 +41,8 @@ class MyAdapter @Inject constructor(
             itemView.setOnClickListener {
                 val api = getItem(adapterPosition).api
                 openRedditPostWithToast(context, api)
+                itemClick(adapterPosition)
+
             }
         }
     }
