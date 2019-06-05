@@ -39,11 +39,7 @@ class MainService : Service() {
             Intent(context, MainService::class.java)
     }
 
-    private val injector = App.applicationComponent
-    private val repository = injector.repository
-
-    private val redditApi = injector.redditApi
-    private val sharedPrefs = injector.sharedPrefs
+    private val repository = App.applicationComponent.repository
     private val compositeDisposable = CompositeDisposable()
 
     //Used for filtering our duplicates, we compare the new network call data to this
@@ -88,8 +84,7 @@ class MainService : Service() {
   so it's less jarring for the user if there's multiple new post.
    */
     private fun getAllNewRedditPost() {
-        //Not a Single anymore so we have to dispose ;<
-        compositeDisposable += redditApi.getAllPostData()
+        compositeDisposable += repository.executeGetAllPostData()
             .map { it.data.children }
             .flatMap { newPostList ->
                 Observable.fromIterable(newPostList)
@@ -117,7 +112,7 @@ class MainService : Service() {
         NotificationManagerCompat.from(this).apply {
 
             notify(
-                notificationId, sharedPrefs.getNewPostNotification(
+                notificationId, repository.getNewPostNotification(
                     newPost.title,
                     newPost.description,
                     createNewPostPendingIntent(newPost.api)
@@ -127,7 +122,7 @@ class MainService : Service() {
         }
 
 
-    //Notification given to the foreground service, needs special attributes to host the group of new notifications
+    //Notification given to the foreground service, needs special attributes to host the group of new notifications.
     private fun createMainNotification(): Notification =
         NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setSmallIcon(R.drawable.white_icon)
