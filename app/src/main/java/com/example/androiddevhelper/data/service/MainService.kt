@@ -41,12 +41,16 @@ class MainService : Service() {
 
     private val injector = App.applicationComponent
     private val repository = injector.repository
+
     private val redditApi = injector.redditApi
     private val sharedPrefs = injector.sharedPrefs
     private val compositeDisposable = CompositeDisposable()
 
     //Used for filtering our duplicates, we compare the new network call data to this
-    private var previousRedditPost: List<NewRedditPost> = emptyList()
+    private var previousNetworkCallData = emptyList<NewRedditPost>()
+
+    //Temporally holds the new network call data so we can update "previousNetworkCallData" onComplete
+    private var newNetworkCallData = emptyList<NewRedditPost>()
 
     //Increments with every new notification
     private var notificationId = 10126
@@ -54,6 +58,7 @@ class MainService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
         startNetworkCallInterval()
 
         restoreListData()
@@ -88,21 +93,23 @@ class MainService : Service() {
             .map { it.data.children }
             .flatMap { newPostList ->
                 Observable.fromIterable(newPostList)
-                    .filter { newPost -> newPost !in previousRedditPost }
-                    .map {
-                        previousRedditPost = newPostList
-                        if (previousRedditPost.isNotEmpty()) saveListFireStore(previousRedditPost)
-                        it
-                    }
+                    .filter { newPost -> newPost !in previousNetworkCallData }
                     .zipWith(Observable.interval(2, TimeUnit.SECONDS))
-                    .map { pair -> pair.first.data }
+                    .map { pair ->
+                        newNetworkCallData = newPostList
+                        pair.first.data
+                    }
             }
             .subscribeBy(
                 onNext = { newPost ->
                     createNewNotification(newPost)
                     repository.insertPostDataToLocalDb(newPost)
                 },
-                onError = { e -> Log.d("zwi", "Error filtering out duplicates: $e") }
+                onComplete = {
+                    previousNetworkCallData = newNetworkCallData
+                    if (previousNetworkCallData.isNotEmpty()) saveListFireStore(previousNetworkCallData)
+                },
+                onError = { e -> Log.d("zwi", "Error in getAllNewRedditPost() : $e") }
             )
     }
 
@@ -122,7 +129,6 @@ class MainService : Service() {
 
     //Notification given to the foreground service, needs special attributes to host the group of new notifications
     private fun createMainNotification(): Notification =
-
         NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setSmallIcon(R.drawable.white_icon)
             setContentTitle("Android Dev Helper!")
@@ -147,11 +153,11 @@ class MainService : Service() {
         )
 
 
-    private fun saveListFireStore(previousRedditPost: List<NewRedditPost>) =
-        repository.saveListToFireStore(previousRedditPost)
+    private fun saveListFireStore(list: List<NewRedditPost>) =
+        repository.saveListToFireStore(list)
 
 
-    //Pulls the saved list from firestore and sets it to the previousRedditPost list, method takes 2-3 seconds to finish
+    //Pulls the saved list from firestore and sets it to the previousNetworkCallData list, method takes 2-3 seconds to finish
     private fun restoreListData() {
         repository.getPreviousRedditPost()
             .addOnSuccessListener { documentData ->
@@ -159,7 +165,7 @@ class MainService : Service() {
                 if (documentData.exists()) {
                     val previousPostObject = documentData.toObject(PreviousRedditPost::class.java)!!
                     val savedList = previousPostObject.previousRedditPost
-                    previousRedditPost = savedList
+                    previousNetworkCallData = savedList
                 }
 
             }.addOnFailureListener { Log.d("zwi", "Failed getting post from firestore") }
