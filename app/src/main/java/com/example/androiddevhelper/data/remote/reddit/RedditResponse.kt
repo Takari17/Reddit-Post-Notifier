@@ -4,7 +4,7 @@ import com.example.androiddevhelper.data.local.PostData
 import com.google.gson.annotations.Expose
 
 
-data class RedditPostResponse(
+data class RedditResponse(
     @Expose
     val `data`: Data
 )

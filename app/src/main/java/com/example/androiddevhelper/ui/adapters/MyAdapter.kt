@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,13 +11,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
 import com.example.androiddevhelper.ui.adapters.MyAdapter.MainViewHolder
-import com.example.androiddevhelper.utils.openRedditPost
+import com.example.androiddevhelper.utils.openRedditPostWithToast
 import kotlinx.android.synthetic.main.new_reddit_post_layout.view.*
 import javax.inject.Inject
 
-/**
- * Observes the local database, service sends data to data base,
- * code is decoupled, everyone's happy
+/*
+ * Observes the local database, service sends data to local data base,
+ * code is decoupled, everyone's happy ;D
  */
 
 class MyAdapter @Inject constructor(
@@ -40,7 +39,7 @@ class MyAdapter @Inject constructor(
         init {
             itemView.setOnClickListener {
                 val api = getItem(adapterPosition).api
-                openRedditPost(context, api)
+                openRedditPostWithToast(context, api)
             }
         }
     }

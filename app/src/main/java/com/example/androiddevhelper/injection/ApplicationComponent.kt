@@ -19,8 +19,6 @@ interface ApplicationComponent {
     val mainViewModel: MainViewModel
     val settingsViewModel: SettingsViewModel
     val repository: Repository
-    val redditApi: RedditApi
-    val sharedPrefs: SharedPrefs
     val myAdapter: MyAdapter
 
     @Component.Factory

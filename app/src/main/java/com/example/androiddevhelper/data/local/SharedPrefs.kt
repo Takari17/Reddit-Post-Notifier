@@ -16,21 +16,19 @@ class SharedPrefs @Inject constructor(
     private val sharedPrefs: SharedPreferences
 ) {
 
+    fun getIsVibrateOn(): Boolean =
+        sharedPrefs.getBoolean("getIsVibrateOn", true)
 
-    fun vibrate(): Boolean =
-        sharedPrefs.getBoolean("vibrate", true)
-
-    fun sound(): Boolean =
-        sharedPrefs.getBoolean("sound", true)
-
+    fun getIsSoundOn(): Boolean =
+        sharedPrefs.getBoolean("getIsSoundOn", true)
 
     /*
-    Notification given to any new post, behavior depends on user selected settings.
-    The user can: disable/enable the vibration, sound, and heads up notification.
+    Notification given to any new Reddit post, behavior depends on user selected settings.
+    The user can: disable/enable the vibration or getIsSoundOn
      */
-    fun getNewPostNotification(title: String, description: String, postContentIntent: PendingIntent): Notification {
+    fun getNewPostNotification(title: String, description: String, postContentIntent: PendingIntent): Notification =
 
-        return NotificationCompat.Builder(context, CHANNEL_ID).apply {
+        NotificationCompat.Builder(context, CHANNEL_ID).apply {
             setSmallIcon(R.drawable.android_icon)
             setContentTitle(title)
             setContentText(description)
@@ -39,10 +37,9 @@ class SharedPrefs @Inject constructor(
             setAutoCancel(true)
             priority = NotificationCompat.PRIORITY_HIGH
 
-            if (vibrate()) setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+            if (getIsVibrateOn()) setDefaults(NotificationCompat.DEFAULT_VIBRATE)
 
-            if (sound()) setDefaults(NotificationCompat.DEFAULT_SOUND)
+            if (getIsSoundOn()) setDefaults(NotificationCompat.DEFAULT_SOUND)
 
         }.build()
-    }
 }

@@ -29,10 +29,7 @@ object ApplicationModule {
     @JvmStatic
     @Provides
     fun provideLocalDb(context: Context): Dao =
-        Room.databaseBuilder(
-            context.applicationContext,
-            DataBase::class.java, DB_TABLE_NAME
-        )
+        Room.databaseBuilder(context.applicationContext, DataBase::class.java, DB_TABLE_NAME)
             .build()
             .dao()
 

@@ -13,7 +13,7 @@ interface Dao {
     @Insert
     fun insertPostData(postData: PostData): Completable
 
-    @Query("SELECT * FROM post_data_table  ORDER BY id asc") // asc = ascending
+    @Query("SELECT * FROM post_data_table  ORDER BY id asc")
     fun getAllPostData(): Observable<List<PostData>>
 
     @Query("DELETE FROM post_data_table WHERE title ==:titleString ")

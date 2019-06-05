@@ -13,7 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.androiddevhelper.App
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
-import com.example.androiddevhelper.data.remote.PreviousRedditPost
+import com.example.androiddevhelper.data.remote.PreviousNetworkCallData
 import com.example.androiddevhelper.data.remote.reddit.NewRedditPost
 import com.example.androiddevhelper.ui.activity.MainActivity
 import com.example.androiddevhelper.utils.*
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 /*
  *When created the service will make a network call every minute, and if they'res any
  *new reddit post it will prompt the user with a notification. When the notification is
- *clicked it will bring the user to reddit and open the clicked post.
+ *clicked it will bring the user to reddit/a browser and open the clicked post.
  */
 class MainService : Service() {
 
@@ -158,7 +158,7 @@ class MainService : Service() {
             .addOnSuccessListener { documentData ->
 
                 if (documentData.exists()) {
-                    val previousPostObject = documentData.toObject(PreviousRedditPost::class.java)!!
+                    val previousPostObject = documentData.toObject(PreviousNetworkCallData::class.java)!!
                     val savedList = previousPostObject.previousRedditPost
                     previousNetworkCallData = savedList
                 }
@@ -184,7 +184,7 @@ class MainService : Service() {
 
         override fun onReceive(context: Context, intent: Intent) {
             val api = intent.action
-            if (api != BASE_URL) openRedditPost(context, api!!)
+            if (api != BASE_URL) openRedditPostWithToast(context, api!!)
         }
     }
 }

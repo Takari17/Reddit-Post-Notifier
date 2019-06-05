@@ -3,6 +3,7 @@ package com.example.androiddevhelper.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
@@ -32,10 +33,11 @@ inline fun <reified T : ViewModel> FragmentActivity.injectViewModel(
     }
 }
 
-
-fun openRedditPost(context: Context, api: String) {
+fun openRedditPostWithToast(context: Context, api: String) {
     val url = BASE_URL + api
-    Intent(
-        Intent.ACTION_VIEW, Uri.parse(url)
-    ).also { intent -> context.startActivity(intent) }
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
+    Toast.makeText(context, "Opening Post...", Toast.LENGTH_SHORT).show()
 }

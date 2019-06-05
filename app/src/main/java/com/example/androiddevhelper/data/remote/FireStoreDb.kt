@@ -14,20 +14,19 @@ class FireStoreDb @Inject constructor(
 ) {
 
     //Saves/Updates previous reddit post list to fireStore
-    fun saveListToDb(previousRedditPost: List<NewRedditPost>) {
-        val previousRedditPostObject = PreviousRedditPost(previousRedditPost)
+    fun saveListToDb(list: List<NewRedditPost>) =
 
-        postDocument.set(previousRedditPostObject, SetOptions.merge())
+        postDocument.set(PreviousNetworkCallData(list), SetOptions.merge())
             .addOnSuccessListener { Log.d("zwi", "Saved list to db") }
             .addOnFailureListener { Log.d("zwi", "Failed saving list to db") }
-    }
+
 
     fun getListFromDb(): Task<DocumentSnapshot> = postDocument.get()
 }
 
 
 //Used so fireStore can return an object
-class PreviousRedditPost(
+class PreviousNetworkCallData(
     val previousRedditPost: List<NewRedditPost>
 ) {
     constructor() : this(emptyList())

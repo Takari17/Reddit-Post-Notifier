@@ -8,15 +8,15 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import com.example.androiddevhelper.App
 import com.example.androiddevhelper.R
-import com.example.androiddevhelper.injection.App
-import com.example.androiddevhelper.injection.injectViewModel
+import com.example.androiddevhelper.utils.injectViewModel
 
 class SettingsActivity : AppCompatActivity() {
 
-    companion object{
+    companion object {
         fun createIntent(context: Context) =
-                Intent(context, SettingsActivity::class.java)
+            Intent(context, SettingsActivity::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,11 +42,11 @@ class SettingsActivity : AppCompatActivity() {
 
             //When one preference is clicked the other gets disabled
             vibrate?.setOnPreferenceClickListener {
-                sound?.isEnabled = !viewModel.sharedPrefs.vibrate() // disabled
-                true // enables the vibrate preference
+                sound?.isEnabled = !viewModel.sharedPrefs.getIsVibrateOn() // disabled
+                true // enables the getIsVibrateOn preference
             }
             sound?.setOnPreferenceClickListener {
-                vibrate?.isEnabled = !viewModel.sharedPrefs.sound() // disabled
+                vibrate?.isEnabled = !viewModel.sharedPrefs.getIsSoundOn() // disabled
                 true
             }
         }
