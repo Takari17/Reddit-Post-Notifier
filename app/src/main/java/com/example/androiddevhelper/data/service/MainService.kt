@@ -125,7 +125,7 @@ class MainService : Service() {
     //Notification given to the foreground service, needs special attributes to host the group of new notifications.
     private fun createMainNotification(): Notification =
         NotificationCompat.Builder(this, CHANNEL_ID).apply {
-            setSmallIcon(R.drawable.white_icon)
+            setSmallIcon(R.drawable.white_android_icon)
             setContentTitle("Android Dev Helper!")
             setContentText("Waiting For New Reddit Post...")
             setGroupSummary(true)

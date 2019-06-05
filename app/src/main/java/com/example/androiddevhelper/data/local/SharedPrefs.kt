@@ -29,7 +29,7 @@ class SharedPrefs @Inject constructor(
     fun getNewPostNotification(title: String, description: String, postContentIntent: PendingIntent): Notification =
 
         NotificationCompat.Builder(context, CHANNEL_ID).apply {
-            setSmallIcon(R.drawable.android_icon)
+            setSmallIcon(R.drawable.white_android_icon)
             setContentTitle(title)
             setContentText(description)
             setContentIntent(postContentIntent)
