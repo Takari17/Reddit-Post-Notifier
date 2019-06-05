@@ -19,5 +19,5 @@ data class Data(
 data class NewRedditPost(
     @Expose
     val `data`: PostData){
-    constructor(): this(PostData(0, "", "", "", ""))
+    constructor(): this(PostData(0, "", "", ""))
 }

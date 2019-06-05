@@ -18,10 +18,7 @@ data class PostData(
     val title: String,
     @SerializedName("permalink")
     @Expose
-    val api: String,
-    @SerializedName("selftext")
-    @Expose
-    val description: String
+    val api: String
 ) {
-    constructor() : this(0, "", "", "", "")
+    constructor() : this(0, "", "", "")
 }

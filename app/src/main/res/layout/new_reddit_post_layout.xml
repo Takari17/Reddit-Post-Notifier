@@ -16,16 +16,23 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/titleTextView" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp" app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="16dp"
+            android:id="@+id/titleTextView"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
             android:textSize="30sp" android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent" tools:text="Title"/>
+            app:layout_constraintBottom_toBottomOf="parent" tools:text="Post Title"
+            app:layout_constraintTop_toBottomOf="@+id/authorTextView" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="24dp" android:layout_marginStart="24dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/authorTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="u/author"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.cardview.widget.CardView>

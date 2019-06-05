@@ -113,8 +113,8 @@ class MainService : Service() {
 
             notify(
                 notificationId, repository.getNewPostNotification(
+                    "u/${newPost.author} Posted:",
                     newPost.title,
-                    newPost.description,
                     createNewPostPendingIntent(newPost.api)
                 )
             )

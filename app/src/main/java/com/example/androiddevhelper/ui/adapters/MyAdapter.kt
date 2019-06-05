@@ -20,6 +20,11 @@ import javax.inject.Inject
  * code is decoupled, everyone's happy ;D
  */
 
+/*
+We can show the author, title
+
+u/userName Posted: Title, days ago posted
+ */
 class MyAdapter @Inject constructor(
     private val context: Context,
     private val itemClick: (Int) ->  Unit
@@ -31,11 +36,15 @@ class MyAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
-            holder.title.text = getItem(position).title
+        holder.apply {
+            title.text = getItem(position).title
+            author.text = "u/${getItem(position).author} Posted:"
+        }
     }
 
     inner class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.titleTextView
+        val author: TextView = itemView.authorTextView
 
         init {
             itemView.setOnClickListener {

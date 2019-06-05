@@ -22,7 +22,7 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         compositeDisposable += repository.observeAllPostData()
             .subscribeBy(
                 onNext = { postDataList -> newPostDataList.postValue(postDataList) },
-                onError = { Log.d("zwi", "Error observing all post data from local db") }
+                onError = { Log.d("zwi", "Error observing all post data from local db: $it") }
             )
     }
 
