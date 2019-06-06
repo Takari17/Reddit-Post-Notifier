@@ -30,6 +30,7 @@ object ApplicationModule {
     @Provides
     fun provideLocalDb(context: Context): Dao =
         Room.databaseBuilder(context.applicationContext, DataBase::class.java, DB_TABLE_NAME)
+            .fallbackToDestructiveMigration()
             .build()
             .dao()
 

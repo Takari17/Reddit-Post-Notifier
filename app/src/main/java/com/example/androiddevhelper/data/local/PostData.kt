@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = ENTITY_TABLE_NAME)
 data class PostData(
-    //Retrofit will ignore the primary key id because it's missing the Expose annotation
+    //Retrofit will ignore the primary key id because it's missing the Expose annotation (which is good)
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     @Expose
