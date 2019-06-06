@@ -13,15 +13,15 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
-                android:name=".ui.activity.SettingsActivity"
+                android:name=".ui.features.settings.SettingsActivity"
                 android:label="@string/title_activity_settings"
                 android:launchMode="singleTop"
-                android:parentActivityName=".ui.activity.MainActivity">
+                android:parentActivityName=".ui.features.postlist.PostListActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value="com.example.androiddevhelper.ui.activity.MainActivity"/>
+                    android:value="com.example.androiddevhelper.ui.features.postlist.PostListActivity"/>
         </activity>
-        <activity android:name=".ui.activity.MainActivity"
+        <activity android:name=".ui.features.postlist.PostListActivity"
                   android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

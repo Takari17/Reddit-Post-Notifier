@@ -15,7 +15,7 @@ import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
 import com.example.androiddevhelper.data.remote.PreviousNetworkCallData
 import com.example.androiddevhelper.data.remote.reddit.NewRedditPost
-import com.example.androiddevhelper.ui.activity.MainActivity
+import com.example.androiddevhelper.ui.features.postlist.PostListActivity
 import com.example.androiddevhelper.utils.*
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -144,7 +144,7 @@ class MainService : Service() {
 
     private fun createActivityPendingIntent(): PendingIntent =
         PendingIntent.getActivity(
-            this, 0, MainActivity.createIntent(this), 0
+            this, 0, PostListActivity.createIntent(this), 0
         )
 
 

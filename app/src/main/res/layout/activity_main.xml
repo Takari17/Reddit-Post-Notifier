@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#585A57"
-        tools:context=".ui.activity.MainActivity">
+        tools:context=".ui.features.postlist.PostListActivity">
 
     <androidx.recyclerview.widget.RecyclerView
             android:layout_height="0dp"

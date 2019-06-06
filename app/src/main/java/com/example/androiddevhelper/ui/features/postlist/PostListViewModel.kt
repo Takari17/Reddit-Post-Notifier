@@ -1,4 +1,4 @@
-package com.example.androiddevhelper.ui.viewmodel
+package com.example.androiddevhelper.ui.features.postlist
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -12,7 +12,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 
-class MainViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class PostListViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
     private val newPostDataList = MutableLiveData<List<PostData>>()

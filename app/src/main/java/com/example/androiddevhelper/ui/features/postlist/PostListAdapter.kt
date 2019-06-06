@@ -1,4 +1,4 @@
-package com.example.androiddevhelper.ui.adapters
+package com.example.androiddevhelper.ui.features.postlist
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
-import com.example.androiddevhelper.ui.adapters.MyAdapter.MainViewHolder
+import com.example.androiddevhelper.ui.features.postlist.PostListAdapter.MainViewHolder
 import com.example.androiddevhelper.utils.getUserString
 import com.example.androiddevhelper.utils.openRedditPostWithToast
 import kotlinx.android.synthetic.main.new_reddit_post_layout.view.*
@@ -21,12 +21,7 @@ import javax.inject.Inject
  * code is decoupled, everyone's happy ;D
  */
 
-/*
-We can show the author, title
-
-u/userName Posted: Title, days ago posted
- */
-class MyAdapter @Inject constructor(
+class PostListAdapter @Inject constructor(
     private val context: Context,
     private val itemClick: (Int) ->  Unit
 ) : ListAdapter<PostData, MainViewHolder>(CustomDiffCallback()) {

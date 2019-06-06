@@ -1,4 +1,4 @@
-package com.example.androiddevhelper.ui.activity
+package com.example.androiddevhelper.ui.features.settings
 
 import android.content.Context
 import android.content.Intent
@@ -25,7 +25,9 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.settings_activity)
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.settings, SettingsFragment())
+            .replace(R.id.settings,
+                SettingsFragment()
+            )
             .commit()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setTheme(R.style.PreferenceStyle)

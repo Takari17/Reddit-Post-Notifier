@@ -1,4 +1,4 @@
-package com.example.androiddevhelper.ui.activity
+package com.example.androiddevhelper.ui.features.postlist
 
 import android.content.Context
 import android.content.Intent
@@ -14,25 +14,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddevhelper.App.Companion.applicationComponent
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
-import com.example.androiddevhelper.ui.adapters.MyAdapter
+import com.example.androiddevhelper.ui.features.settings.SettingsActivity
 import com.example.androiddevhelper.utils.injectViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity() {
+class PostListActivity : AppCompatActivity() {
 
     companion object {
         fun createIntent(context: Context) =
-            Intent(context, MainActivity::class.java)
+            Intent(context, PostListActivity::class.java)
     }
 
     private val injector = applicationComponent
-    private val viewModel by injectViewModel { injector.mainViewModel }
+    private val viewModel by injectViewModel { injector.postListViewModel }
 
     //Deletes item when clicked
-    private val myAdapter: MyAdapter by lazy {
-        MyAdapter(this) { position ->
-            myAdapter.fetchItem(position)?.let { item ->
+    private val postListAdapter: PostListAdapter by lazy {
+        PostListAdapter(this) { position ->
+            postListAdapter.fetchItem(position)?.let { item ->
                 viewModel.deleteItem(item.title)
             }
         }
@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         recyclerView.apply {
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = myAdapter
+            layoutManager = LinearLayoutManager(this@PostListActivity)
+            adapter = postListAdapter
         }
     }
 
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-                myAdapter.fetchItem(viewHolder.adapterPosition)?.let { clickedItem ->
+                postListAdapter.fetchItem(viewHolder.adapterPosition)?.let { clickedItem ->
                     viewModel.deleteItem(clickedItem.title)
                 }
 
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateNewRedditPost(newPostDataList: List<PostData>) =
-        myAdapter.updateList(newPostDataList)
+        postListAdapter.updateList(newPostDataList)
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -1,4 +1,4 @@
-package com.example.androiddevhelper.ui.viewmodel
+package com.example.androiddevhelper.ui.features.settings
 
 import androidx.lifecycle.ViewModel
 import com.example.androiddevhelper.data.local.SharedPrefs
