@@ -10,17 +10,17 @@ import com.example.androiddevhelper.utils.CHANNEL_ID
 import com.example.androiddevhelper.utils.CUSTOM_GROUP_ID
 import javax.inject.Inject
 
-
 class SharedPrefs @Inject constructor(
     private val context: Context,
     private val sharedPrefs: SharedPreferences
 ) {
 
+    //todo create an enum class for this
     fun getIsVibrateOn(): Boolean =
-        sharedPrefs.getBoolean("getIsVibrateOn", true)
+        sharedPrefs.getBoolean("vibrate", true)
 
     fun getIsSoundOn(): Boolean =
-        sharedPrefs.getBoolean("getIsSoundOn", true)
+        sharedPrefs.getBoolean("sound", true)
 
     /*
     Notification given to any new Reddit post, behavior depends on user selected settings.

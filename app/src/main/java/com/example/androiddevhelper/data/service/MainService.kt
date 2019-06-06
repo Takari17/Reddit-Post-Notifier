@@ -113,7 +113,7 @@ class MainService : Service() {
 
             notify(
                 notificationId, repository.getNewPostNotification(
-                    "u/${newPost.author} Posted:",
+                    getUserString(this@MainService, R.string.user_posted, newPost.author),
                     newPost.title,
                     createNewPostPendingIntent(newPost.api)
                 )
@@ -126,8 +126,8 @@ class MainService : Service() {
     private fun createMainNotification(): Notification =
         NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setSmallIcon(R.drawable.white_android_icon)
-            setContentTitle("Android Dev Helper!")
-            setContentText("Waiting For New Reddit Post...")
+            setContentTitle(getResourceString(this@MainService, R.string.app_name))
+            setContentText(getResourceString(this@MainService, R.string.waiting_for_new_post))
             setGroupSummary(true)
             setGroup(CUSTOM_GROUP_ID)
             setCategory(NotificationCompat.CATEGORY_MESSAGE)

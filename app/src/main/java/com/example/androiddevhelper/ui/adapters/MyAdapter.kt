@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.data.local.PostData
 import com.example.androiddevhelper.ui.adapters.MyAdapter.MainViewHolder
+import com.example.androiddevhelper.utils.getUserString
 import com.example.androiddevhelper.utils.openRedditPostWithToast
 import kotlinx.android.synthetic.main.new_reddit_post_layout.view.*
 import javax.inject.Inject
@@ -38,7 +39,7 @@ class MyAdapter @Inject constructor(
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         holder.apply {
             title.text = getItem(position).title
-            author.text = "u/${getItem(position).author} Posted:"
+            author.text = getUserString(context, R.string.user_posted, getItem(position).author)
         }
     }
 
