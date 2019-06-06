@@ -10,6 +10,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.example.androiddevhelper.App
 import com.example.androiddevhelper.R
+import com.example.androiddevhelper.utils.PreferenceKey
 import com.example.androiddevhelper.utils.injectViewModel
 
 class SettingsActivity : AppCompatActivity() {
@@ -33,8 +34,8 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
 
         //Don't want to inject into view model since these are views
-        private val vibrate: SwitchPreferenceCompat? = findPreference("vibrate")
-        private val sound: SwitchPreferenceCompat? = findPreference("sound")
+        private val vibrate: SwitchPreferenceCompat? = findPreference(PreferenceKey.VIBRATE.key)
+        private val sound: SwitchPreferenceCompat? = findPreference(PreferenceKey.SOUND.key)
         private val viewModel by injectViewModel { App.applicationComponent.settingsViewModel }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

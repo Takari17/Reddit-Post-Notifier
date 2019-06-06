@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.utils.CHANNEL_ID
 import com.example.androiddevhelper.utils.CUSTOM_GROUP_ID
+import com.example.androiddevhelper.utils.PreferenceKey
 import javax.inject.Inject
 
 class SharedPrefs @Inject constructor(
@@ -15,12 +16,11 @@ class SharedPrefs @Inject constructor(
     private val sharedPrefs: SharedPreferences
 ) {
 
-    //todo create an enum class for this
     fun getIsVibrateOn(): Boolean =
-        sharedPrefs.getBoolean("vibrate", true)
+        sharedPrefs.getBoolean(PreferenceKey.VIBRATE.key, true)
 
     fun getIsSoundOn(): Boolean =
-        sharedPrefs.getBoolean("sound", true)
+        sharedPrefs.getBoolean(PreferenceKey.SOUND.key, true)
 
     /*
     Notification given to any new Reddit post, behavior depends on user selected settings.

@@ -10,3 +10,7 @@ const val CHANNEL_ID = "My channel"
 const val CUSTOM_GROUP_ID = "My own custom group :D"
 const val ENTITY_TABLE_NAME = "post_data_table"
 const val DB_TABLE_NAME = "android_dev_helper_db"
+
+enum class PreferenceKey(val key: String) {
+    VIBRATE("vibrate"), SOUND("sound")
+}
