@@ -1,5 +1,5 @@
 # Android Dev Helper
-I was quite disappointed when I found out that there's no setting on reddit to receive a notification for a new post on a certain subreddit. So I decided to create an app that does just that but specifically for r/androiddev since it's my most used subreddit.
+Sends a push notification for any new post on the android dev subreddit 
 
 <p float="left">
   <img src= "images/screenshot1.jpg" width="250" />
@@ -19,10 +19,3 @@ You can then install from android studio.
 * Architecture Components
 * Dagger2
 * FireStore
-
-## Contributing 
-If you wish to contribute to this project email me first at takariharrison@gmail.com
-
-## How it Works
-I used a foreground service that makes a network call to r/androiddev every minute using Retrofit.
-If there's any new post it then stores the post data in a Room data base which the PostListActivity's recycler view observes. And of course it prompts the user with a notification as well. 
