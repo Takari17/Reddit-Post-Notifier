@@ -4,13 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.room.Room
-import com.example.androiddevhelper.data.local.Dao
-import com.example.androiddevhelper.data.local.DataBase
-import com.example.androiddevhelper.data.remote.reddit.RedditApi
-import com.example.androiddevhelper.utils.BASE_URL
-import com.example.androiddevhelper.utils.DB_TABLE_NAME
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.androiddevhelper.BASE_URL
+import com.example.androiddevhelper.DB_TABLE_NAME
+import com.example.androiddevhelper.feature.postdata.data.local.PostDataDao
+import com.example.androiddevhelper.feature.postdata.data.local.RoomDb
+import com.example.androiddevhelper.feature.postdata.data.remote.RedditApi
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -26,13 +24,14 @@ object ApplicationModule {
     fun provideSharedPreferences(context: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
 
+
     @JvmStatic
     @Provides
-    fun provideLocalDb(context: Context): Dao =
-        Room.databaseBuilder(context.applicationContext, DataBase::class.java, DB_TABLE_NAME)
+    fun providePostDataDao(context: Context): PostDataDao =
+        Room.databaseBuilder(context.applicationContext, RoomDb::class.java, DB_TABLE_NAME)
             .fallbackToDestructiveMigration()
             .build()
-            .dao()
+            .postDataDao
 
 
     @JvmStatic
@@ -49,13 +48,8 @@ object ApplicationModule {
             .create(RedditApi::class.java)
     }
 
-    @JvmStatic
-    @Provides
-    fun provideFireStore(): FirebaseFirestore =
-        FirebaseFirestore.getInstance()
 
     @JvmStatic
     @Provides
-    fun provideRecentPostDocument(fireStore: FirebaseFirestore): DocumentReference =
-        fireStore.collection("New Reddit Post ").document("Previous Reddit Post")
+    fun notificationId(): Int = 2201
 }

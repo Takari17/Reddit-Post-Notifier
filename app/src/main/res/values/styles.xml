@@ -8,11 +8,5 @@
         <item name="colorAccent">#66bb6a</item>
     </style>
 
-    <style name="PreferenceStyle">
-
-        <item name="android:textColorSecondary">#B3BDB8</item>
-        <item name="android:textColor">#F8FCF9</item>
-
-    </style>
 
 </resources>

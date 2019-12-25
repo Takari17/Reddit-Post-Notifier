@@ -1,22 +1,23 @@
-package com.example.androiddevhelper.utils
+package com.example.androiddevhelper
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceFragmentCompat
-import com.example.androiddevhelper.R
 
 /*
 Higher order static factory functions that accepts a ViewModel and returns it's lazy reference.
  */
 
-inline fun <reified T : ViewModel> PreferenceFragmentCompat.injectViewModel(
+inline fun <reified T : ViewModel> Fragment.injectViewModel(
     crossinline provider: () -> T
 ) = viewModels<T> {
     object : ViewModelProvider.Factory {
@@ -34,6 +35,7 @@ inline fun <reified T : ViewModel> FragmentActivity.injectViewModel(
     }
 }
 
+//todo refactor
 fun openRedditPostWithToast(context: Context, api: String) {
     val url = BASE_URL + api
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
@@ -43,6 +45,5 @@ fun openRedditPostWithToast(context: Context, api: String) {
     Toast.makeText(context, R.string.opening_post, Toast.LENGTH_SHORT).show()
 }
 
-fun getResourceString(context: Context, id: Int): String = context.resources.getString(id)
+fun logD(message: String) = Log.d("zwi", message)
 
-fun getUserString(context: Context, id: Int, user: String): String =  context.resources.getString(id, user)
