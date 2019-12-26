@@ -1,10 +1,9 @@
 # Android Dev Helper
-Sends a push notification for any new post on the android dev subreddit 
 
 <p float="left">
-  <img src= "images/screenshot1.jpg" width="250" />
-  <img src= "images/screenshot2.jpg" width="250" /> 
-  <img src= "images/screenshot3.jpg" width="250" /> 
+  <img src= "images/screenshot1.png" width="250" />
+  <img src= "images/screenshot2.png" width="250" /> 
+  <img src= "images/screenshot3.png" width="250" /> 
 
 </p>
 
