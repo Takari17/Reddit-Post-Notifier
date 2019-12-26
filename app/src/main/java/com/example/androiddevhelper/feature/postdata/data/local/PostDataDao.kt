@@ -2,6 +2,7 @@ package com.example.androiddevhelper.feature.postdata.data.local
 
 import androidx.room.*
 import com.example.androiddevhelper.feature.postdata.data.local.PostData
+import com.example.androiddevhelper.feature.postdata.ui.PostDataFragment
 import io.reactivex.Completable
 import io.reactivex.Observable
 import javax.inject.Singleton
@@ -16,8 +17,8 @@ interface PostDataDao {
     @Query("SELECT * FROM reddit_post_data_table  ORDER BY id asc")
     fun listen(): Observable<List<PostData>>
 
-    @Query("DELETE FROM reddit_post_data_table WHERE title ==:postTitle ")
-    fun deleteItem(vararg postTitle: String): Completable
+    @Delete
+    fun deleteItem(vararg postData: PostData): Completable
 
     @Query("DELETE FROM reddit_post_data_table")
     fun deleteAll(): Completable

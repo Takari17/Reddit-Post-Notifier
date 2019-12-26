@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#585A57"
+        tools:context=".feature.MainActivity"
+        android:id="@+id/validConstraintLayout"
+        >
+
+    <Button
+            android:id="@+id/listenForPostButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Listen For Post"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/validateSubButton"
+            app:layout_constraintTop_toBottomOf="@+id/subRedditNamr" />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/validateSubButton"
+            tools:visibility="invisible" />
+
+    <Button
+            android:id="@+id/validateSubButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Validate Subreddit"
+            app:layout_constraintEnd_toStartOf="@+id/listenForPostButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/subRedditNamr" />
+
+    <Button
+            android:id="@+id/stopListeningButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stop Listening "
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listeningView" />
+
+    <EditText
+            android:id="@+id/subRedditNamr"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:ems="10"
+            android:hint="askreddit"
+            android:imeOptions="actionDone"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+            android:id="@+id/statusImage"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:elevation="2dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/help_icon"
+            android:visibility="visible"
+            android:enabled="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/progressBar"
+            app:layout_constraintStart_toStartOf="@+id/progressBar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline2"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+            android:id="@+id/subNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="24dp"
+            android:text="Observing r/subRedditName"
+            android:textSize="24dp"
+            app:layout_constraintBottom_toBottomOf="@+id/listeningView"
+            app:layout_constraintEnd_toEndOf="@id/listeningView"
+            app:layout_constraintEnd_toStartOf="@+id/listeningLoader"
+            app:layout_constraintStart_toStartOf="@+id/listeningView"
+            app:layout_constraintTop_toTopOf="@+id/listeningView"
+            app:layout_constraintVertical_bias="1.0" />
+
+    <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/listeningLoader"
+            style="@style/SpinKitView.Large.Wave"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            app:SpinKit_Color="#4caf50"
+            app:layout_constraintBottom_toBottomOf="@+id/listeningView"
+            app:layout_constraintEnd_toEndOf="@+id/listeningView"
+            app:layout_constraintTop_toTopOf="@+id/listeningView" />
+
+    <View
+            android:id="@+id/listeningView"
+            android:layout_width="350dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/listenForPostButton"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.30" />
+
+    <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.70" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

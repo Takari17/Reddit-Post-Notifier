@@ -8,4 +8,8 @@ import javax.inject.Singleton
 @Database(entities = [PostData::class], version = 1)
 abstract class RoomDb : RoomDatabase() {
     abstract val postDataDao: PostDataDao
+
+    companion object{
+        const val POST_DATA_DB = "Post Data Database"
+    }
 }

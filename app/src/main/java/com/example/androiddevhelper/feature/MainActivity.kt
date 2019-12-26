@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.feature.postdata.ui.PostDataFragment
 
+
 class MainActivity : AppCompatActivity() {
 
-    //todo look into why zwi said this was bad, then take notes.
     private val postListFragment = PostDataFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {

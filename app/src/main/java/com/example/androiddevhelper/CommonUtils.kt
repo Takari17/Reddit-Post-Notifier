@@ -13,10 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceFragmentCompat
 
-/*
-Higher order static factory functions that accepts a ViewModel and returns it's lazy reference.
- */
-
+//Allows dagger to inject ViewModels with args.
 inline fun <reified T : ViewModel> Fragment.injectViewModel(
     crossinline provider: () -> T
 ) = viewModels<T> {
@@ -26,23 +23,12 @@ inline fun <reified T : ViewModel> Fragment.injectViewModel(
     }
 }
 
-inline fun <reified T : ViewModel> FragmentActivity.injectViewModel(
-    crossinline provider: () -> T
-) = viewModels<T> {
-    object : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-            provider() as T
-    }
-}
 
-//todo refactor
-fun openRedditPostWithToast(context: Context, api: String) {
-    val url = BASE_URL + api
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+fun Context.openRedditPost(sourceUrl: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(sourceUrl)).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
-    context.startActivity(intent)
-    Toast.makeText(context, R.string.opening_post, Toast.LENGTH_SHORT).show()
+    this.startActivity(intent)
 }
 
 fun logD(message: String) = Log.d("zwi", message)

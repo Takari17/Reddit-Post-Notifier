@@ -16,4 +16,8 @@ interface RedditApi {
      */
     @GET("https://www.reddit.com/r/{name}/new.json")
     fun getAllPostData(@Path("name") name: String): Observable<RedditResponse>
+
+    companion object{
+        const val BASE_URL = "https://www.reddit.com"
+    }
 }

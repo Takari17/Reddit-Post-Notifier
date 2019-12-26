@@ -16,7 +16,7 @@ data class PostData(
     val author: String,
     @Expose
     val title: String,
-    @SerializedName("permalink")
+    @SerializedName("url")
     @Expose
     val sourceUrl: String
 ){

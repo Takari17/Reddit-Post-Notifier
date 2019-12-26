@@ -3,10 +3,9 @@ package com.example.androiddevhelper.feature.postdata.service
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.androiddevhelper.CHANNEL_ID
+import com.example.androiddevhelper.App.Companion.CHANNEL_ID
 import com.example.androiddevhelper.R
 import com.example.androiddevhelper.feature.MainActivity
 import com.example.androiddevhelper.feature.postdata.data.local.PostData
@@ -36,6 +35,8 @@ class PostDataNotifications @Inject constructor(
             setContentIntent(pendingIntent)
             setGroup(GROUP_ID)
             setAutoCancel(true)
+            setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+            setDefaults(NotificationCompat.DEFAULT_SOUND)
         }.build()
 
 

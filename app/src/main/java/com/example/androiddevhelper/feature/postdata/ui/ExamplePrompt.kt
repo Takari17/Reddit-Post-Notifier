@@ -16,7 +16,7 @@ class ExamplePrompt : DialogFragment() {
 
             setMessage("Type in the SubReddit's name with no spaces. It's Case-insensitive.  \n \nGood: askreddit \nBad: Ask Reddit \nGood: InstantRegret \nBad: Instant Regret")
 
-            setIcon(R.drawable.question_mark)
+            setIcon(R.drawable.help_icon)
 
         }.create()
 }

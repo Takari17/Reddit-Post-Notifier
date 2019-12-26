@@ -4,11 +4,14 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.room.Room
-import com.example.androiddevhelper.BASE_URL
-import com.example.androiddevhelper.DB_TABLE_NAME
+
 import com.example.androiddevhelper.feature.postdata.data.local.PostDataDao
 import com.example.androiddevhelper.feature.postdata.data.local.RoomDb
+import com.example.androiddevhelper.feature.postdata.data.local.RoomDb.Companion.POST_DATA_DB
 import com.example.androiddevhelper.feature.postdata.data.remote.RedditApi
+import com.example.androiddevhelper.feature.postdata.data.remote.RedditApi.Companion.BASE_URL
+import com.example.androiddevhelper.feature.postdata.ui.PostDataFragment
+import com.example.androiddevhelper.feature.postdata.ui.PostDataUIState
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -28,7 +31,7 @@ object ApplicationModule {
     @JvmStatic
     @Provides
     fun providePostDataDao(context: Context): PostDataDao =
-        Room.databaseBuilder(context.applicationContext, RoomDb::class.java, DB_TABLE_NAME)
+        Room.databaseBuilder(context.applicationContext, RoomDb::class.java, POST_DATA_DB)
             .fallbackToDestructiveMigration()
             .build()
             .postDataDao
@@ -52,4 +55,15 @@ object ApplicationModule {
     @JvmStatic
     @Provides
     fun notificationId(): Int = 2201
+
+
+    @JvmStatic
+    @Provides
+    fun provideDefaultState(): PostDataUIState =
+        PostDataUIState(
+            subRedditStatus = PostDataFragment.SubRedditStatus.Empty,
+            isLoading = false,
+            postDataList = emptyList(),
+            subReddit = ""
+        )
 }

@@ -33,8 +33,8 @@ class Repository @Inject constructor(
         postDataDao.listen()
 
 
-    fun deletePostData(postTitle: String): Completable =
-        postDataDao.deleteItem(postTitle)
+    fun deletePostData(postData: PostData): Completable =
+        postDataDao.deleteItem(postData)
 
 
     fun deleteAllPostData(): Completable =
@@ -52,8 +52,11 @@ class Repository @Inject constructor(
             }
 
 
+    /**
+     * Returns the first 24 new post.
+     */
     fun executeGetNewPost(subReddit: String): Observable<RedditResponse> =
-        redditApi.getAllPostData(subReddit) //todo consider changing this to "getFirstTwentyPost".
+        redditApi.getAllPostData(subReddit)
 
 
     fun saveSubRedditName(subReddit: String) {

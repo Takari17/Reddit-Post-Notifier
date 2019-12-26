@@ -32,10 +32,10 @@ class App : Application() {
         }
     }
 
-
     //Exposed globally for injecting dependencies in Android Component Classes
     companion object {
         fun applicationComponent() = component
+        const val CHANNEL_ID = "custom channel Id"
     }
 
 }
