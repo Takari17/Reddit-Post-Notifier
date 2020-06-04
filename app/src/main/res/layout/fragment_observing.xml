@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:fancy="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/observingFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.post.ui.NewPostFragment">
+
+
+    <mehdi.sakout.fancybuttons.FancyButton
+            android:id="@+id/stopObservingButton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="Stop Observing"
+            app:layout_constraintBottom_toTopOf="@+id/postHistoryRecyclerView"
+            app:layout_constraintEnd_toStartOf="@+id/guideline12"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/postHistoryRecyclerView"
+            app:layout_constraintTop_toTopOf="@+id/guideline11"
+            app:layout_constraintVertical_bias="0.384"
+            fancy:fb_borderWidth="5dp"
+            fancy:fb_defaultColor="@color/colorAccent"
+            fancy:fb_focusColor="@color/colorPrimaryLight"
+            fancy:fb_radius="40dp" />
+
+    <TextView
+            android:id="@+id/subNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Observing"
+            android:textColor="#FFFFFF"
+            android:textSize="24dp"
+            app:layout_constraintStart_toStartOf="@+id/postHistoryRecyclerView"
+            app:layout_constraintTop_toTopOf="@+id/subRedditIconRecyclerView" />
+
+    <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/listeningLoader"
+            style="@style/SpinKitView.Large.Wave"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:SpinKit_Color="#4caf50"
+            app:layout_constraintBottom_toTopOf="@+id/stopObservingButton"
+            app:layout_constraintEnd_toEndOf="@+id/subNameTextView"
+            app:layout_constraintStart_toStartOf="@+id/subNameTextView"
+            app:layout_constraintTop_toBottomOf="@+id/subNameTextView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/postHistoryRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline5"
+            app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="198dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/subRedditIconRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/stopObservingButton"
+            app:layout_constraintEnd_toStartOf="@+id/imageView4"
+            app:layout_constraintStart_toEndOf="@+id/subNameTextView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:scaleType="center"
+            android:src="@drawable/foward_arrow"
+            app:layout_constraintBottom_toBottomOf="@+id/subRedditIconRecyclerView"
+            app:layout_constraintEnd_toEndOf="@+id/postHistoryRecyclerView"
+            app:layout_constraintTop_toTopOf="@+id/subRedditIconRecyclerView" />
+
+    <TextView
+            android:id="@+id/timerTextView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:gravity="center"
+            android:text="Connecting In: ..."
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/stopObservingButton"
+            app:layout_constraintEnd_toEndOf="@+id/postHistoryRecyclerView"
+            app:layout_constraintStart_toEndOf="@+id/stopObservingButton"
+            app:layout_constraintTop_toTopOf="@+id/stopObservingButton" />
+
+    <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="116dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="205dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

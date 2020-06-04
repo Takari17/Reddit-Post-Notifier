@@ -5,41 +5,51 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="16dp">
+        android:foreground="?android:attr/selectableItemBackground">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#3A3C3A"
-
-            >
-
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryLight">
 
         <TextView
-                android:id="@+id/titleTextView"
-                android:layout_width="wrap_content"
+                android:id="@+id/postTitleTextView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:textColor="#9EC2A0"
-                android:textSize="30sp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="start"
+                android:maxLines="5"
+                android:textColor="#FFFFFF"
+                android:textStyle="italic|bold"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/postInfoTextView"
                 tools:text="Post Title" />
 
         <TextView
-                android:id="@+id/authorTextView"
-                android:layout_width="wrap_content"
+                android:id="@+id/postInfoTextView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:textColor="#8DC590"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textColor="#FFFFFF"
+                app:autoSizeMaxTextSize="30sp"
+                app:autoSizeMinTextSize="15sp"
+                app:autoSizeStepGranularity="5sp"
+                app:autoSizeTextType="uniform"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/titleTextView"
-                tools:text="u/author" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="u/author from r/subReddit posted:" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

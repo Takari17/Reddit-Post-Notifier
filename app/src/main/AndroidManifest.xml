@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.example.androiddevhelper">
+        package="com.takari.redditpostnotifier">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <supports-screens
+            android:smallScreens="true"
+            android:normalScreens="true"
+            android:largeScreens="false"
+            android:xlargeScreens="false" />
 
     <application
-            android:name=".App"
+            android:name="com.takari.redditpostnotifier.App"
             android:allowBackup="true"
-            android:icon="@drawable/androi_dev_helper_icon"
+            android:icon="@drawable/web_hi_res_512"
             android:label="@string/app_name"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
+        <activity android:name="com.takari.redditpostnotifier.ui.history.PostHistoryActivity"></activity>
         <activity
-                android:name=".feature.MainActivity"
+                android:name="com.takari.redditpostnotifier.ui.settings.SettingsActivity"
+                android:configChanges="orientation|keyboardHidden"
+                android:label="@string/title_activity_settings"
+                android:screenOrientation="portrait"></activity>
+        <activity
+                android:name="com.takari.redditpostnotifier.ui.common.MainActivity"
+                android:configChanges="orientation|keyboardHidden"
                 android:launchMode="singleTop"
+                android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,8 +37,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.example.androiddevhelper.feature.postdata.service.PostDataService" />
-        <receiver android:name=".feature.postdata.service.PostDataReceiver" />
+        <service android:name="com.takari.redditpostnotifier.ui.post.service.NewPostService" />
+
+        <receiver android:name="com.takari.redditpostnotifier.ui.post.service.NewPostReceiver" />
     </application>
 
 </manifest>
