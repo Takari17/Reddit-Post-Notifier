@@ -1,5 +1,5 @@
 # Android Dev Helper
-Sends a push notification for any new post on the android dev subreddit 
+Sends a push notification for any new post on the android dev takari.androiddevhelper.feature.takari.androiddevhelper.feature.postdata.data.postdata.data.takari.androiddevhelper.feature.postdata.data.postdata.local.takari.androiddevhelper.feature.postdata.data.subreddit
 
 <p float="left">
   <img src= "images/screenshot1.jpg" width="250" />
