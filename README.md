@@ -32,9 +32,6 @@ You can download it from the playstore [right here.](https://play.google.com/sto
   - [RxAndroid](https://github.com/ReactiveX/RxAndroid) - gives Schedulers access to the MainThread.
   - [RxBindings](https://github.com/JakeWharton/RxBinding) - Binds UI widgets to Observables.
   - [RxRelay](https://github.com/JakeWharton/RxRelay) - adds Relays which are essentially Subjects without termination events.
-- [JUnit5](https://junit.org/junit5/) - a modern unit testing framework used to verify functionality of heavy logic.
-- [Espresso](https://developer.android.com/training/testing/espresso) - an instrumentation testing framework used to verify the functionality of the UI.
-- [MockK](https://mockk.io/) - used for creating fake mock objects for unit testing.
 - [Toasty](https://github.com/GrenderG/Toasty) - creates beautiful custom made Toast with background colors, icons, etc.
 - [Room](https://developer.android.com/training/data-storage/room) - abstracts the complexity of managing SQL databases
 - [Android KTX](https://developer.android.com/kotlin/ktx) - a set of Kotlin extensions.
