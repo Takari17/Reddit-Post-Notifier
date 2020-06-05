@@ -19,5 +19,7 @@ data class PostData(
     @SerializedName("subreddit")
     val subReddit: String,
     val author: String,
-    val title: String
+    val title: String,
+    @SerializedName("crosspost_parent")
+    val crossPostParentName: String?
 )

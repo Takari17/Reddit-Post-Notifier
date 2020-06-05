@@ -14,10 +14,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.R
+import com.takari.redditpostnotifier.data.misc.RedditApi
 import com.takari.redditpostnotifier.data.subreddit.SubRedditData
 import com.takari.redditpostnotifier.misc.injectViewModel
 import com.takari.redditpostnotifier.misc.logD
 import com.takari.redditpostnotifier.misc.openRedditPost
+import com.takari.redditpostnotifier.misc.prependBaseUrlIfCrossPost
 import com.takari.redditpostnotifier.ui.common.SharedViewModel
 import com.takari.redditpostnotifier.ui.history.NewPostAdapter
 import com.takari.redditpostnotifier.ui.post.service.NewPostService
@@ -35,16 +37,8 @@ class NewPostFragment : Fragment() {
     private val subIconAdapter = ChosenSubRedditAdapter()
     private val serviceIntent by lazy { Intent(context, NewPostService::class.java) }
     private val compositeDisposable = CompositeDisposable()
-    private val postHistoryAdapter by lazy {
-        NewPostAdapter { clickedPostData ->
+    private lateinit var newPostAdapter: NewPostAdapter
 
-            requireContext().openRedditPost(clickedPostData.sourceUrl)
-
-            compositeDisposable += viewModel.deleteDbPostData(clickedPostData)
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onError = { e -> logD("Error deletingDbPostData in PostHistoryActivity: $e") })
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -60,6 +54,18 @@ class NewPostFragment : Fragment() {
             requireContext().stopService(serviceIntent)
         }
 
+        newPostAdapter = NewPostAdapter { clickedPostData ->
+
+            val url = prependBaseUrlIfCrossPost(clickedPostData)
+
+            requireContext().openRedditPost(url)
+
+            compositeDisposable += viewModel.deleteDbPostData(clickedPostData)
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(onError = { e -> logD("Error deletingDbPostData in PostHistoryActivity: $e") })
+        }
+
+
         subRedditIconRecyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -69,7 +75,7 @@ class NewPostFragment : Fragment() {
         postHistoryRecyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
-            adapter = postHistoryAdapter
+            adapter = newPostAdapter
             swipeHandler.attachToRecyclerView(this)
         }
     }
@@ -100,7 +106,7 @@ class NewPostFragment : Fragment() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { postDataList -> postHistoryAdapter.submitList(postDataList) },
+                onNext = { postDataList -> newPostAdapter.submitList(postDataList) },
                 onError = { e -> logD("Error listeningToDbPostData in NewPostFragment: $e") }
             )
     }
@@ -122,7 +128,7 @@ class NewPostFragment : Fragment() {
         ): Boolean = false //Don't need this callback
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val swipedPostData = postHistoryAdapter.getPostData(viewHolder.adapterPosition)
+            val swipedPostData = newPostAdapter.getPostData(viewHolder.adapterPosition)
             swipedPostData?.let {
                 compositeDisposable += viewModel.deleteDbPostData(swipedPostData)
                     .subscribeOn(Schedulers.io())

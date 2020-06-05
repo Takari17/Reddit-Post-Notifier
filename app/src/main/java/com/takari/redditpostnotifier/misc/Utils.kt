@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.takari.redditpostnotifier.data.misc.RedditApi
+import com.takari.redditpostnotifier.data.post.PostData
 
 
 /**
@@ -44,5 +46,10 @@ fun Context.openRedditPost(sourceUrl: String) {
     }
     this.startActivity(intent)
 }
+
+
+fun prependBaseUrlIfCrossPost(postData: PostData) =
+    if (postData.crossPostParentName != null) "${RedditApi.BASE_URL}${postData.sourceUrl}"
+    else postData.sourceUrl
 
 fun logD(message: String) = Log.d("zwi", message)

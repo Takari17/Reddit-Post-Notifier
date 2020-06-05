@@ -74,6 +74,7 @@ dependencies {
 
     //Mockk
     testImplementation "io.mockk:mockk:1.9.3"
+    androidTestImplementation "io.mockk:mockk-android:1.9.3"
 
     //Toasty
     implementation 'com.github.GrenderG:Toasty:1.4.2'

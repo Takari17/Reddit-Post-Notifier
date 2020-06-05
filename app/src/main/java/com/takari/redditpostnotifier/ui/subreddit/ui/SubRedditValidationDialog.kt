@@ -31,7 +31,7 @@ import mehdi.sakout.fancybuttons.FancyButton
 import java.util.concurrent.TimeUnit
 
 
-class SubRedditValidationDialog : AppCompatDialogFragment() { 
+class SubRedditValidationDialog : AppCompatDialogFragment() {
 
     private val viewModel: SharedViewModel by injectViewModel { App.applicationComponent().sharedViewModel } // do we need to scope our dependencies?
     private val compositeDisposable = CompositeDisposable()

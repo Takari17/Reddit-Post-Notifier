@@ -9,7 +9,7 @@ import com.takari.redditpostnotifier.data.subreddit.SubRedditDataDao
 import javax.inject.Singleton
 
 @Singleton
-@Database(entities = [PostData::class, SubRedditData::class], version = 1)
+@Database(entities = [PostData::class, SubRedditData::class], version = 2)
 abstract class RoomDb : RoomDatabase() {
 
     companion object {

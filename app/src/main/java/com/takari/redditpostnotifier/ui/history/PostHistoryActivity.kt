@@ -16,6 +16,7 @@ import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.misc.injectViewModel
 import com.takari.redditpostnotifier.misc.logD
 import com.takari.redditpostnotifier.misc.openRedditPost
+import com.takari.redditpostnotifier.misc.prependBaseUrlIfCrossPost
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -29,16 +30,7 @@ class PostHistoryActivity : AppCompatActivity() {
     private val viewModel: PostHistoryViewModel by injectViewModel { App.applicationComponent().postHistoryViewModel }
     private val compositeDisposable = CompositeDisposable()
     private val confirmationDialog = ConfirmationDialog()
-    private val postHistoryAdapter by lazy {
-        NewPostAdapter { clickedPostData ->
-
-            this.openRedditPost(clickedPostData.sourceUrl)
-
-            compositeDisposable += viewModel.deleteDbPostData(clickedPostData)
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onError = { e -> logD("Error deletingDbPostData in PostHistoryActivity: $e") })
-        }
-    }
+    private lateinit var newPostAdapter: NewPostAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,10 +39,21 @@ class PostHistoryActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         window.navigationBarColor = Color.parseColor("#171A23")
 
+        newPostAdapter = NewPostAdapter { clickedPostData ->
+
+            val url = prependBaseUrlIfCrossPost(clickedPostData)
+
+            this.openRedditPost(url)
+
+            compositeDisposable += viewModel.deleteDbPostData(clickedPostData)
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(onError = { e -> logD("Error deletingDbPostData in PostHistoryActivity: $e") })
+        }
+
         postHistoryRecyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
-            adapter = postHistoryAdapter
+            adapter = newPostAdapter
             swipeHandler.attachToRecyclerView(this)
         }
 
@@ -74,7 +77,7 @@ class PostHistoryActivity : AppCompatActivity() {
             .subscribeBy(
                 onNext = { postDataList ->
                     if (postDataList.isNotEmpty()) {
-                        postHistoryAdapter.submitList(postDataList)
+                        newPostAdapter.submitList(postDataList)
                         showPostHistoryViews()
                     } else showNothingFoundViews()
                 },
@@ -123,7 +126,7 @@ class PostHistoryActivity : AppCompatActivity() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-            val swipedPostData = postHistoryAdapter.getPostData(viewHolder.adapterPosition)
+            val swipedPostData = newPostAdapter.getPostData(viewHolder.adapterPosition)
 
             swipedPostData?.let {
                 compositeDisposable += viewModel.deleteDbPostData(swipedPostData)

@@ -1,12 +1,13 @@
 package com.takari.redditpostnotifier.ui.common
 
 import androidx.lifecycle.ViewModel
+import com.jakewharton.rxrelay2.BehaviorRelay
+import com.jakewharton.rxrelay2.PublishRelay
+import com.takari.redditpostnotifier.data.misc.RedditApi
 import com.takari.redditpostnotifier.data.misc.Repository
 import com.takari.redditpostnotifier.data.post.PostData
 import com.takari.redditpostnotifier.data.subreddit.SubRedditData
 import com.takari.redditpostnotifier.misc.ResponseState
-import com.jakewharton.rxrelay2.BehaviorRelay
-import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleSource
