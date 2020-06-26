@@ -8,28 +8,22 @@ import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.App.Companion.applicationComponent
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.data.post.PostData
 import com.takari.redditpostnotifier.data.subreddit.SubRedditData
+import com.takari.redditpostnotifier.misc.logD
 import com.takari.redditpostnotifier.ui.common.MainActivity
 import com.takari.redditpostnotifier.ui.history.PostHistoryActivity
 import com.takari.redditpostnotifier.ui.settings.SettingsActivity
-import com.takari.redditpostnotifier.misc.logD
-import com.takari.redditpostnotifier.misc.RepeatingCountDownTimer
-import com.jakewharton.rxrelay2.BehaviorRelay
-import com.jakewharton.rxrelay2.PublishRelay
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
-/*
-  The service should act live a view, it should only observe observables exposed to it. It should not contain observables.
-  I think it's ok to have state in your service since it's not stifled by too many life cycle stuff. Just be sure to isolate
-  heavy logic
- */
+
+//Coroutines can be started from a service as long as we handle clean up. Config changes obvs wont be an issue.
 class NewPostService : Service() {
 
     companion object {
@@ -38,31 +32,12 @@ class NewPostService : Service() {
     }
 
     private val repository = applicationComponent().repository
-    private val compositeDisposable = CompositeDisposable()
-    private var isSubscribed = false
-    private var id = 2201
+    private val id = 2201
     private var newPostCounter = 0
-    val reset = PublishRelay.create<Unit>()
-    val repeatingCountDownTimer = BehaviorRelay.create<String>()
-    //used for filtering new post from old
-    private val viewedPost: MutableList<PostData> = mutableListOf()
-
-    private val resetIntent: PendingIntent by lazy {
-        val receiverIntent = Intent(this, NewPostReceiver::class.java).apply {
-            action = RESET
-        }
-        PendingIntent.getBroadcast(this, 2, receiverIntent, 0)
-    }
-
-    private val postHistoryIntent: PendingIntent by lazy {
-        val intent = Intent(this, PostHistoryActivity::class.java)
-        PendingIntent.getActivity(this, 0, intent, 0)
-    }
-
-    private val activityIntent:  PendingIntent by lazy {
-        val intent = Intent(this, MainActivity::class.java)
-        PendingIntent.getActivity(this, 0, intent, 0)
-    }
+    var onServiceDestroy: (() -> Unit) = {}
+    private val viewedPost: MutableList<PostData> = mutableListOf() //used for filtering new post from old
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val currentTime = MutableLiveData("0")
 
 
     override fun onCreate() {
@@ -78,73 +53,38 @@ class NewPostService : Service() {
         return LocalBinder()
     }
 
+    /*Only invoked on initialization and on reset.*/
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         if (intent!!.action == RESET) {
-            reset.accept(Unit)
             destroyService()
             return START_NOT_STICKY
         }
 
-        if (!isSubscribed) {
+        val subRedditDataList: ArrayList<SubRedditData> = //late init var
+            intent.getParcelableArrayListExtra(SubRedditData.SUB_REDDIT_DATA_NAME)!!
 
-            val subRedditDataList: ArrayList<SubRedditData> =
-                intent.getParcelableArrayListExtra(SubRedditData.SUB_REDDIT_DATA_NAME)!!
+        val subNames = mutableListOf<String>()
+        subRedditDataList.forEach { subNames.add(it.name) }
 
-            val apiRequestRateInMillis: Long = repository.getIntFromSharedPrefs(
-                key = SettingsActivity.API_REQUEST_RATE_KEY,
-                defaultValue = 1
-            ).toLong().toMilli()
+        val apiRequestRateInMillis: Long = repository.getIntFromSharedPrefs(
+            key = SettingsActivity.API_REQUEST_RATE_KEY,
+            defaultValue = 1
+        ).toLong().toMilli()
 
-            val _repeatingCountDownTimer = RepeatingCountDownTimer(apiRequestRateInMillis)
+        saveInitialPostInList(subNames.toTypedArray())
 
-            compositeDisposable += repository.getMultiplePostDataList(subRedditDataList)
-                .doOnSubscribe { isSubscribed = true }
-                .doOnDispose { isSubscribed = false }
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(
-                    onNext = { postList -> postList.forEach { post -> viewedPost.add(post.data) } },
-                    onError = { logD("Error making initial api call in NewPostService: $it") }
-                )
+        listenForNewPost(apiRequestRateInMillis, subNames.toTypedArray())
 
-            compositeDisposable += _repeatingCountDownTimer.get
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(
-                    onNext = { timeInSeconds ->
-                        repeatingCountDownTimer.accept(timeInSeconds)
-                        updateNotificationTimer(timeInSeconds)
-                    },
-                    onError = { e -> logD("Error observing_RepeatingCountDownTimer in NewPostService: $e") }
-                )
-
-            compositeDisposable += repository.getNewPostDataWithInterval(
-                apiRequestRateInMillis,
-                subRedditDataList,
-                viewedPost
-            )
-                .subscribeOn(Schedulers.io())
-                .flatMapSingle { postData ->
-                    //Updates the view's recycler view since it observes the db
-                    repository.insertPostDataInDb(postData)
-                        .map { postData }
-                }
-                .subscribeBy(
-                    onNext = { postData ->
-                        newPostCounter++
-                        updateNewPostNotification(postData, newPostCounter)
-                    },
-                    onError = { logD("Error observing for new post in NewPostService: $it") }
-                )
-        }
-
-        startForeground(id, getMainNotification(repeatingCountDownTimer.value ?: "..."))
+        startForeground(id, getMainNotification("0"))
         return START_REDELIVER_INTENT
     }
 
     override fun onDestroy() {
         super.onDestroy()
         running = false
-        compositeDisposable.clear()
+        scope.cancel()
+        onServiceDestroy()
     }
 
     private fun destroyService() {
@@ -152,7 +92,59 @@ class NewPostService : Service() {
         stopForeground(true)
     }
 
+    //Used for future filtering comparisons. Filters through a long list so Dispatchers.Default is used
+    private fun saveInitialPostInList(subNames: Array<String>) {
+        scope.launch {
+            repository.getPostList(*subNames)
+                .flowOn(Dispatchers.Default)
+                .collect { postList -> postList.forEach { post -> viewedPost.add(post.data) } }
+        }
+    }
+
+    //Don't have to call stop bc it'll be destroyed when the scope clears.
+    private fun flowRepeatingCountDownTimer(startingMillis: Long) = flow {
+        var currentTime = startingMillis
+        while (true) {
+            currentTime -= 1000
+            emit(currentTime.toSecondsFormat())
+            delay(1000)
+            if (currentTime <= 0L) {
+                currentTime = startingMillis
+            }
+        }
+    }
+
+    private fun listenForNewPost(apiRequestRateInMillis: Long, subNames: Array<String>) {
+        scope.launch {
+            flowRepeatingCountDownTimer(apiRequestRateInMillis)
+                .map {
+                    currentTime.value = it
+                    updateNotificationTimer(it)
+                    it
+                }
+                .filter { it == "0" }
+                .flatMapMerge { repository.getPostList(*subNames) }
+                .flatMapMerge { it.asFlow() }
+                .filter { it.data !in viewedPost }
+                .catch { logD(it.message) }
+                .retry { true } // retries on any exception
+                .collect { post ->
+                    viewedPost.add(post.data)
+                    newPostCounter++
+                    updateNewPostNotification(post.data, newPostCounter)
+                    repository.insertPostDataInDb(post.data)
+                }
+        }
+    }
+
+    private fun Long.toSecondsFormat(): String {
+        val seconds = (this / 1000).toInt()
+        return seconds.toString()
+    }
+
     private fun Long.toMilli(): Long = (this * 60000)
+
+    fun observeCurrentTime(): LiveData<String> = currentTime
 
     private fun getMainNotification(timeInSeconds: String): Notification =
         NotificationCompat.Builder(this, App.CHANNEL_ID).apply {
@@ -181,7 +173,25 @@ class NewPostService : Service() {
     }
 
     private fun updateNewPostNotification(postData: PostData, newPostCounter: Int) {
-        NotificationManagerCompat.from(this).notify(238, showFoundPostNotification(postData, newPostCounter))
+        NotificationManagerCompat.from(this)
+            .notify(238, showFoundPostNotification(postData, newPostCounter))
+    }
+
+    private val resetIntent: PendingIntent by lazy {
+        val receiverIntent = Intent(this, NewPostReceiver::class.java).apply {
+            action = RESET
+        }
+        PendingIntent.getBroadcast(this, 2, receiverIntent, 0)
+    }
+
+    private val postHistoryIntent: PendingIntent by lazy {
+        val intent = Intent(this, PostHistoryActivity::class.java)
+        PendingIntent.getActivity(this, 0, intent, 0)
+    }
+
+    private val activityIntent: PendingIntent by lazy {
+        val intent = Intent(this, MainActivity::class.java)
+        PendingIntent.getActivity(this, 0, intent, 0)
     }
 }
 

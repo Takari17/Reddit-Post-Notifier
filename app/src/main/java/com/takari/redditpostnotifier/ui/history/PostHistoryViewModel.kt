@@ -1,21 +1,30 @@
 package com.takari.redditpostnotifier.ui.history
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.takari.redditpostnotifier.data.misc.Repository
 import com.takari.redditpostnotifier.data.post.PostData
-import io.reactivex.Observable
-import io.reactivex.Single
+import com.takari.redditpostnotifier.misc.ResponseState
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 class PostHistoryViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
-    fun listenToDbPostData(): Observable<List<PostData>> =
+    val dbPostData = liveData {
         repository.listenToPostDataInDb()
+            .collect { postDataList -> emit(postDataList) }
+    }
 
-    fun deleteDbPostData(postData: PostData): Single<Unit> =
-        repository.deletePostDataInDb(postData)
 
-    fun deleteAllDbPostData(): Single<Unit> =
-        repository.deleteAllDbPostData()
+    fun deleteDbPostData(postData: PostData) {
+        viewModelScope.launch { repository.deletePostDataInDb(postData) }
+    }
+
+    fun deleteAllDbPostData() {
+        viewModelScope.launch { repository.deleteAllDbPostData() }
+    }
 }

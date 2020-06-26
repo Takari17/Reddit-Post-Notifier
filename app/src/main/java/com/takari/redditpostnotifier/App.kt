@@ -7,10 +7,19 @@ import android.os.Build
 import com.takari.redditpostnotifier.di.ApplicationComponent
 import com.takari.redditpostnotifier.di.DaggerApplicationComponent
 
+
 class App : Application() {
+
+    companion object {
+        //Exposed globally for DI in Android Component classes
+        fun applicationComponent() = component
+        const val CHANNEL_ID = "custom channel Id"
+    }
+
 
     override fun onCreate() {
         super.onCreate()
+
         component = DaggerApplicationComponent
             .factory()
             .create(applicationContext)
@@ -30,12 +39,6 @@ class App : Application() {
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
-    }
-
-    companion object {
-        //Exposed globally for injecting dependencies in Android Component classes1
-        fun applicationComponent() = component
-        const val CHANNEL_ID = "custom channel Id"
     }
 }
 

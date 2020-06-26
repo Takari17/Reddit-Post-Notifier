@@ -60,7 +60,7 @@ class SettingsActivity : AppCompatActivity() {
 
     class ApiRequestRateDialog : AppCompatDialogFragment() {
 
-        var onItemSelected: ((Int) -> Unit)? = null
+        var onItemSelected: ((Int) -> Unit) = {}
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
 
@@ -77,7 +77,7 @@ class SettingsActivity : AppCompatActivity() {
                 )
 
                 setSingleChoiceItems(options, -1) { _: Any, index: Int ->
-                    onItemSelected?.let { it(options[index].extractInts()) }
+                    onItemSelected(options[index].extractInts())
                     dismiss()
                 }
 

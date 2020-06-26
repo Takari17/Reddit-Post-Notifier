@@ -9,12 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.R
-import com.takari.redditpostnotifier.data.misc.RedditApi
 import com.takari.redditpostnotifier.data.subreddit.SubRedditData
 import com.takari.redditpostnotifier.misc.injectViewModel
 import com.takari.redditpostnotifier.misc.logD
@@ -23,12 +24,8 @@ import com.takari.redditpostnotifier.misc.prependBaseUrlIfCrossPost
 import com.takari.redditpostnotifier.ui.common.SharedViewModel
 import com.takari.redditpostnotifier.ui.history.NewPostAdapter
 import com.takari.redditpostnotifier.ui.post.service.NewPostService
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_observing.*
+import kotlinx.coroutines.launch
 
 
 class NewPostFragment : Fragment() {
@@ -36,12 +33,13 @@ class NewPostFragment : Fragment() {
     private val viewModel: SharedViewModel by injectViewModel { App.applicationComponent().sharedViewModel } // do we need to scope our dependencies?
     private val subIconAdapter = ChosenSubRedditAdapter()
     private val serviceIntent by lazy { Intent(context, NewPostService::class.java) }
-    private val compositeDisposable = CompositeDisposable()
     private lateinit var newPostAdapter: NewPostAdapter
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_observing, container, false)
     }
@@ -57,14 +55,9 @@ class NewPostFragment : Fragment() {
         newPostAdapter = NewPostAdapter { clickedPostData ->
 
             val url = prependBaseUrlIfCrossPost(clickedPostData)
-
             requireContext().openRedditPost(url)
-
-            compositeDisposable += viewModel.deleteDbPostData(clickedPostData)
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onError = { e -> logD("Error deletingDbPostData in PostHistoryActivity: $e") })
+            viewModel.deleteDbPostData(clickedPostData)
         }
-
 
         subRedditIconRecyclerView.apply {
             setHasFixedSize(true)
@@ -78,45 +71,29 @@ class NewPostFragment : Fragment() {
             adapter = newPostAdapter
             swipeHandler.attachToRecyclerView(this)
         }
+
+        viewModel.dbSubRedditData.observe(viewLifecycleOwner, Observer { subRedditData ->
+            subIconAdapter.submitList(subRedditData)
+        })
+
+        viewModel.dbPostData.observe(viewLifecycleOwner, Observer { postDataList ->
+            newPostAdapter.submitList(postDataList)
+        })
     }
 
     override fun onStart() {
         super.onStart()
 
         if (!NewPostService.isRunning()) {
-            serviceIntent.putParcelableArrayListExtra(
-                SubRedditData.SUB_REDDIT_DATA_NAME,
-                ArrayList(viewModel.subRedditDataList.value!!)
-            )
-            requireContext().startService(serviceIntent)
-            requireContext().bindService(serviceIntent, serviceConnection, 0)
-        } else {
-            requireContext().bindService(serviceIntent, serviceConnection, 0)
-        }
-
-        compositeDisposable += viewModel.listenToDbSubRedditData()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { subRedditData -> subIconAdapter.submitList(subRedditData) },
-                onError = { e -> logD("Error listeningToDbData in NewPostFragment: $e") }
-            )
-
-        compositeDisposable += viewModel.listenToDbPostData()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { postDataList -> newPostAdapter.submitList(postDataList) },
-                onError = { e -> logD("Error listeningToDbPostData in NewPostFragment: $e") }
-            )
+            startService()
+            bindToService()
+        } else bindToService()
     }
 
     override fun onStop() {
         super.onStop()
-        compositeDisposable.clear()
-        requireContext().unbindService(serviceConnection)
+        unbindFromService()
     }
-
 
     private val swipeHandler = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
         0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT //Only can swipe right or left
@@ -129,14 +106,25 @@ class NewPostFragment : Fragment() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val swipedPostData = newPostAdapter.getPostData(viewHolder.adapterPosition)
-            swipedPostData?.let {
-                compositeDisposable += viewModel.deleteDbPostData(swipedPostData)
-                    .subscribeOn(Schedulers.io())
-                    .subscribeBy(onError = { e -> logD("Error deletingDbPostData in PostHistoryActivity: $e") })
-            }
-        }
+            swipedPostData?.let { viewModel.deleteDbPostData(swipedPostData) } }
     })
 
+    private fun startService() {
+        serviceIntent.putParcelableArrayListExtra(
+            SubRedditData.SUB_REDDIT_DATA_NAME,
+            //cant be null at this point
+            ArrayList(viewModel.subRedditDataList!!)
+        )
+        requireContext().startService(serviceIntent)
+    }
+
+    private fun bindToService() {
+        requireContext().bindService(serviceIntent, serviceConnection, 0)
+    }
+
+    private fun unbindFromService() {
+        requireContext().unbindService(serviceConnection)
+    }
 
     private val serviceConnection = object : ServiceConnection {
 
@@ -144,24 +132,16 @@ class NewPostFragment : Fragment() {
 
             val postDataService = (service as NewPostService.LocalBinder).getService()
 
-            compositeDisposable += postDataService.repeatingCountDownTimer
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { timeInSeconds ->
-                        timerTextView.text = "Connecting In: $timeInSeconds secs"
-                    },
-                    onError = { e -> logD("Error observing repeatingCountDownTimer in NewPostFragment: $e") }
-                )
+            //Service is already in the main thread
+            postDataService.observeCurrentTime().observe(viewLifecycleOwner, Observer { timeInSeconds ->
+                timerTextView.text = "Connecting In: $timeInSeconds secs"
+            })
 
-            compositeDisposable += postDataService.reset
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { viewModel.switchContainers(SharedViewModel.FragmentName.SubRedditFragment) },
-                    onError = { e -> logD("Error observing postDataService.reset in NewPostFragment: $e") }
-                )
+            postDataService.onServiceDestroy = {
+                viewModel.switchContainers(SharedViewModel.FragmentName.SubRedditFragment)
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {}
     }
-
 }

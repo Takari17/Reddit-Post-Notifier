@@ -21,7 +21,6 @@ class QueuedSubredditsAdapter(
     QueuedSubRedditDiffCallback()
 ) {
 
-
     private val swipeHandler = ItemTouchHelper(object :
         ItemTouchHelper.SimpleCallback(
             0,

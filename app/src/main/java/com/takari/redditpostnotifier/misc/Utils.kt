@@ -52,4 +52,4 @@ fun prependBaseUrlIfCrossPost(postData: PostData) =
     if (postData.crossPostParentName != null) "${RedditApi.BASE_URL}${postData.sourceUrl}"
     else postData.sourceUrl
 
-fun logD(message: String) = Log.d("zwi", message)
+fun logD(message: String?) = Log.d("zwi", message)

@@ -8,27 +8,21 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.misc.injectViewModel
-import com.takari.redditpostnotifier.misc.logD
 import com.takari.redditpostnotifier.misc.openRedditPost
 import com.takari.redditpostnotifier.misc.prependBaseUrlIfCrossPost
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_post_history.*
 
 
 class PostHistoryActivity : AppCompatActivity() {
 
     private val viewModel: PostHistoryViewModel by injectViewModel { App.applicationComponent().postHistoryViewModel }
-    private val compositeDisposable = CompositeDisposable()
     private val confirmationDialog = ConfirmationDialog()
     private lateinit var newPostAdapter: NewPostAdapter
 
@@ -42,12 +36,8 @@ class PostHistoryActivity : AppCompatActivity() {
         newPostAdapter = NewPostAdapter { clickedPostData ->
 
             val url = prependBaseUrlIfCrossPost(clickedPostData)
-
             this.openRedditPost(url)
-
-            compositeDisposable += viewModel.deleteDbPostData(clickedPostData)
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onError = { e -> logD("Error deletingDbPostData in PostHistoryActivity: $e") })
+            viewModel.deleteDbPostData(clickedPostData)
         }
 
         postHistoryRecyclerView.apply {
@@ -62,32 +52,14 @@ class PostHistoryActivity : AppCompatActivity() {
                 confirmationDialog.show(supportFragmentManager, "ConfirmationDialog")
         }
 
-        confirmationDialog.onYesSelect = {
-            compositeDisposable += viewModel.deleteAllDbPostData()
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onError = { e -> logD("Error deletingAllDbPostData in PostHistoryFragment: $e") })
-        }
-    }
+        confirmationDialog.onYesSelect = { viewModel.deleteAllDbPostData() }
 
-    override fun onStart() {
-        super.onStart()
-        compositeDisposable += viewModel.listenToDbPostData()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { postDataList ->
-                    if (postDataList.isNotEmpty()) {
-                        newPostAdapter.submitList(postDataList)
-                        showPostHistoryViews()
-                    } else showNothingFoundViews()
-                },
-                onError = { e -> logD("Error listeningToDbPostData in PostHistoryFragment: $e") }
-            )
-    }
-
-    override fun onStop() {
-        super.onStop()
-        compositeDisposable.clear()
+        viewModel.dbPostData.observe(this, Observer { postDataList ->
+            if (postDataList.isNotEmpty()) {
+                newPostAdapter.submitList(postDataList)
+                showPostHistoryViews()
+            } else showNothingFoundViews()
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -128,18 +100,14 @@ class PostHistoryActivity : AppCompatActivity() {
 
             val swipedPostData = newPostAdapter.getPostData(viewHolder.adapterPosition)
 
-            swipedPostData?.let {
-                compositeDisposable += viewModel.deleteDbPostData(swipedPostData)
-                    .subscribeOn(Schedulers.io())
-                    .subscribeBy(onError = { e -> logD("Error deletingDbPostData in PostHistoryActivity: $e") })
-            }
+            if (swipedPostData != null) viewModel.deleteDbPostData(swipedPostData)
         }
     })
 
 
     class ConfirmationDialog : AppCompatDialogFragment() {
 
-        var onYesSelect: ((Unit) -> Unit)? = null
+        var onYesSelect: ((Unit) -> Unit) = {}
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
 
@@ -147,7 +115,7 @@ class PostHistoryActivity : AppCompatActivity() {
 
                 setTitle("Are you sure?")
 
-                setPositiveButton("Yes") { _, _ -> onYesSelect?.let { it(Unit) } }
+                setPositiveButton("Yes") { _, _ -> onYesSelect(Unit) }
 
                 setNegativeButton("No") { _, _ -> }
 

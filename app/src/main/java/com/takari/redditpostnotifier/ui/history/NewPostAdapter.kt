@@ -8,10 +8,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.takari.redditpostnotifier.R
-import com.takari.redditpostnotifier.data.post.Post
 import com.takari.redditpostnotifier.data.post.PostData
 import com.takari.redditpostnotifier.ui.history.NewPostAdapter.MainViewHolder
-import io.reactivex.Single
 import kotlinx.android.synthetic.main.post_data_layout.view.*
 import javax.inject.Inject
 
@@ -20,8 +18,7 @@ class NewPostAdapter @Inject constructor(private val onClick: (PostData) -> Unit
     ListAdapter<PostData, MainViewHolder>(PostDataDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.post_data_layout, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.post_data_layout, parent, false)
         return MainViewHolder(view)
     }
 

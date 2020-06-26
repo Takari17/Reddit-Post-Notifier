@@ -15,22 +15,17 @@ import com.takari.redditpostnotifier.ui.post.service.NewPostService
 import com.takari.redditpostnotifier.ui.post.ui.NewPostFragment
 import com.takari.redditpostnotifier.ui.settings.SettingsActivity
 import com.takari.redditpostnotifier.ui.subreddit.ui.SubRedditFragment
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.post_data_activity.*
 
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        const val POST_DATA_FRAGMENT = "post data fragment"
+        const val SUB_REDDIT_FRAGMENT = "post data fragment"
         const val OBSERVING_FRAGMENT = "observing fragment"
     }
 
     private val viewModel by injectViewModel { App.applicationComponent().sharedViewModel }
-    private val compositeDisposable = CompositeDisposable()
     private lateinit var subRedditFragment: Fragment
     private lateinit var newPostFragment: Fragment
 
@@ -40,8 +35,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.post_data_activity)
         window.navigationBarColor = Color.parseColor("#171A23")
 
-        //checks if fragments exist to avoid creating duplicates
-        subRedditFragment = supportFragmentManager.findFragmentByTag(POST_DATA_FRAGMENT)
+        //checks if fragments already exist to avoid creating duplicates
+        subRedditFragment = supportFragmentManager.findFragmentByTag(SUB_REDDIT_FRAGMENT)
             ?: SubRedditFragment()
 
         newPostFragment = supportFragmentManager.findFragmentByTag(OBSERVING_FRAGMENT)
@@ -49,55 +44,23 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
 
-            if (NewPostService.isRunning()) {
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(container.id, newPostFragment, OBSERVING_FRAGMENT)
-                    .commit()
-            } else
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(container.id, subRedditFragment, POST_DATA_FRAGMENT)
-                    .commit()
+            if (NewPostService.isRunning())
+                addInitialFragment(newPostFragment, OBSERVING_FRAGMENT)
+            else
+                addInitialFragment(subRedditFragment, SUB_REDDIT_FRAGMENT)
         }
-    }
 
-    override fun onStart() {
-        super.onStart()
+        viewModel.switchContainers = { fragmentName ->
+            when (fragmentName) {
+                SharedViewModel.FragmentName.SubRedditFragment ->
+                    if (!subRedditFragment.isAdded)
+                        switchToSubRedditFragment()
 
-        compositeDisposable += viewModel.currentFragment
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { fragmentName ->
-
-                when (fragmentName) {
-                    SharedViewModel.FragmentName.SubRedditFragment -> {
-                        if (!subRedditFragment.isAdded) {
-
-                            supportFragmentManager
-                                .beginTransaction()
-                                .setCustomAnimations(R.anim.slide_up_in, R.anim.slide_up_out)
-                                .replace(container.id, subRedditFragment, POST_DATA_FRAGMENT)
-                                .commit()
-                        }
-                    }
-
-                    SharedViewModel.FragmentName.NewPostFragment -> {
-                        if (!newPostFragment.isAdded) {
-                            supportFragmentManager
-                                .beginTransaction()
-                                .setCustomAnimations(R.anim.slide_down_in, R.anim.slide_down_out)
-                                .replace(container.id, newPostFragment, OBSERVING_FRAGMENT)
-                                .commit()
-                        }
-                    }
-                }
+                SharedViewModel.FragmentName.NewPostFragment ->
+                    if (!newPostFragment.isAdded)
+                        switchToNewPostFragment()
             }
-
-    }
-
-    override fun onStop() {
-        super.onStop()
-        compositeDisposable.clear()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -120,5 +83,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun addInitialFragment(fragment: Fragment, tag: String) {
+        supportFragmentManager
+            .beginTransaction()
+            .add(container.id, fragment, tag)
+            .commit()
+    }
+
+    private fun switchToSubRedditFragment() {
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.slide_up_in, R.anim.slide_up_out)
+            .replace(container.id, subRedditFragment, SUB_REDDIT_FRAGMENT)
+            .commit()
+    }
+
+    private fun switchToNewPostFragment() {
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.slide_down_in, R.anim.slide_down_out)
+            .replace(container.id, newPostFragment, OBSERVING_FRAGMENT)
+            .commit()
     }
 }

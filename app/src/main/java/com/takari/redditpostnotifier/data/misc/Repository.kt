@@ -2,23 +2,19 @@ package com.takari.redditpostnotifier.data.misc
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.takari.redditpostnotifier.data.post.NewPostListResponse
 import com.takari.redditpostnotifier.data.post.Post
 import com.takari.redditpostnotifier.data.post.PostData
 import com.takari.redditpostnotifier.data.post.PostDataDao
 import com.takari.redditpostnotifier.data.subreddit.SubRedditData
 import com.takari.redditpostnotifier.data.subreddit.SubRedditDataDao
-import com.takari.redditpostnotifier.misc.ResponseState
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.SingleSource
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/*
-Remember, the repo should be the only one making API calls, it's the single source of truth.
- */
+
 @Singleton
 class Repository @Inject constructor(
     private val redditApi: RedditApi,
@@ -27,64 +23,40 @@ class Repository @Inject constructor(
     private val sharedPrefs: SharedPreferences
 ) {
 
-    private fun getPostDataList(name: String): Single<NewPostListResponse> =
-        redditApi.getNewPostList(name)
-
-    fun getMultiplePostDataList(subRedditDataList: List<SubRedditData>): Observable<List<Post>> =
-        Observable.just(Unit)
-            .flatMapIterable { subRedditDataList }
-            .flatMapSingle { subRedditData -> getPostDataList(subRedditData.name) }
-            .map { it.data.children }
-
-    fun getNewPostDataWithInterval(
-        millis: Long,
-        subRedditDataList: List<SubRedditData>,
-        viewedPost: MutableList<PostData>
-    ): Observable<PostData> =
-        Observable.interval(millis, TimeUnit.MILLISECONDS)
-            .flatMap { getMultiplePostDataList(subRedditDataList) }
-            .flatMap { postList ->
-                Observable.fromIterable(postList)
-                    .filter { post -> post.data !in viewedPost }
-                    .map { post ->
-                        viewedPost.add(post.data)
-                        post.data
-                    }
-            }
-
-    fun getSubRedditData(name: String): Single<ResponseState<SubRedditData>> {
-
-        return redditApi.getSubRedditData(name)
-            .map<ResponseState<SubRedditData>> { subRedditData ->
-                ResponseState.Success(subRedditData.data)
-            }
-            .onErrorResumeNext { e ->
-                SingleSource { single -> single.onSuccess(ResponseState.Error(e.message ?: "")) }
-            }
+    //Goes through a list of subRedditNames and retrieves the newest post for each of them
+    suspend fun getPostList(vararg subName: String): Flow<List<Post>> = flow {
+        subName.forEach { name ->
+            val postList = redditApi.getNewPostList(name).data.children
+            emit(postList)
+        }
     }
 
-    fun insertPostDataInDb(post: PostData): Single<Unit> =
-        postDataDao.insertReplace(post)
+    suspend fun getSubRedditData(name: String): SubRedditData =
+        redditApi.getSubRedditData(name).data
 
-    fun listenToPostDataInDb(): Observable<List<PostData>> =
+    suspend fun insertPostDataInDb(post: PostData) = withContext(Dispatchers.Default) {
+        postDataDao.insertReplace(post)
+    }
+
+    fun listenToPostDataInDb(): Flow<List<PostData>> =
         postDataDao.listenForPostData()
 
-    fun deletePostDataInDb(postData: PostData): Single<Unit> =
+    suspend fun deletePostDataInDb(postData: PostData): Unit =
         postDataDao.deleteItem(postData)
 
-    fun deleteAllDbPostData(): Single<Unit> =
+    suspend fun deleteAllDbPostData(): Unit =
         postDataDao.deleteAll()
 
-    fun insertSubRedditDataInDb(subRedditData: SubRedditData) =
+    suspend fun insertSubRedditDataInDb(subRedditData: SubRedditData) =
         subRedditDataDao.insertReplace(subRedditData)
 
-    fun listenToDbSubRedditData(): Observable<List<SubRedditData>> =
+    fun listenToDbSubRedditData(): Flow<List<SubRedditData>> =
         subRedditDataDao.listenToSubRedditData()
 
-    fun getCurrentDbSubRedditData(): Single<List<SubRedditData>> =
+    suspend fun getCurrentDbSubRedditData(): List<SubRedditData> =
         subRedditDataDao.getCurrentSubRedditData()
 
-    fun deleteDbSubRedditData(subRedditData: SubRedditData): Single<Unit> =
+    suspend fun deleteDbSubRedditData(subRedditData: SubRedditData): Unit =
         subRedditDataDao.deleteItem(subRedditData)
 
     fun getIntFromSharedPrefs(key: String, defaultValue: Int): Int =

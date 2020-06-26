@@ -10,33 +10,32 @@ import android.widget.Button
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.core.animation.doOnEnd
+import androidx.lifecycle.viewModelScope
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.textfield.TextInputLayout
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.R
+import com.takari.redditpostnotifier.misc.ResponseState
+import com.takari.redditpostnotifier.misc.injectViewModel
+import com.takari.redditpostnotifier.ui.common.SharedViewModel
 import com.takari.redditpostnotifier.ui.common.SharedViewModel.Companion.LIMIT_REACHED
 import com.takari.redditpostnotifier.ui.common.SharedViewModel.Companion.NO_CONNECTION
-import com.takari.redditpostnotifier.misc.injectViewModel
-import com.takari.redditpostnotifier.misc.ResponseState
-import com.takari.redditpostnotifier.ui.common.SharedViewModel
-import com.jakewharton.rxbinding3.view.clicks
 import es.dmoral.toasty.Toasty
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import mehdi.sakout.fancybuttons.FancyButton
-import java.util.concurrent.TimeUnit
 
 
 class SubRedditValidationDialog : AppCompatDialogFragment() {
 
     private val viewModel: SharedViewModel by injectViewModel { App.applicationComponent().sharedViewModel } // do we need to scope our dependencies?
-    private val compositeDisposable = CompositeDisposable()
     private lateinit var successAnim: LottieAnimationView
     private lateinit var errorAnim: LottieAnimationView
+
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         AlertDialog.Builder(activity).apply {
@@ -69,44 +68,36 @@ class SubRedditValidationDialog : AppCompatDialogFragment() {
 
             finishedButton.setOnClickListener { dismiss() }
 
-            compositeDisposable += validationButton.clicks()
-                .throttleFirst(2, TimeUnit.SECONDS)
-                .doOnEach { progressBar.show() }
-                .flatMap {
-                    viewModel.getSubRedditData(subRedditName.editText!!.text.toString())
-                        .subscribeOn(Schedulers.io()) // the initial observable is a view so it cant sub on a background thread, only the flatmap's can
-                        .toObservable()
-                }
-                .flatMap { result ->
-                    if (result is ResponseState.Success) {
-                        viewModel.insertDbSubRedditDataWithCap(result.item!!)
-                            .toObservable()
-                            .subscribeOn(Schedulers.io())
-                    } else Observable.just(result)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy { result -> //onError won't be invoked
+            validationButton.setOnClickListener {
+                val subName = subRedditName.editText!!.text.toString()
 
-                    progressBar.hide()
-
-                    when (result) {
-                        is ResponseState.Success -> {
-                            showSuccessAnimation()
-                            showSuccessToast(context)
+                viewModel.viewModelScope.launch {
+                    viewModel.getAndCacheSubRedditData(subName)
+                        .flowOn(Dispatchers.Main)
+                        .onStart {
+                            progressBar.show()
+                            validationButton.isEnabled = false
                         }
-                        is ResponseState.Error -> {
-                            showErrorAnimation()
-                            showErrorToast(context, result.eMsg)
+                        .onCompletion {
+                            progressBar.hide()
+                            validationButton.isEnabled = true
                         }
-                    }
-
+                        .collect { response ->
+                            when (response) {
+                                is ResponseState.Success -> {
+                                    showSuccessAnimation()
+                                    showSuccessToast(context)
+                                }
+                                is ResponseState.Error -> {
+                                    showErrorAnimation()
+                                    showErrorToast(context, response.e.message)
+                                }
+                            }
+                        }
                 }
+            }
         }.create()
 
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.clear()
-    }
 
     private fun ProgressBar.hide() {
         this.visibility = View.INVISIBLE
@@ -137,7 +128,7 @@ class SubRedditValidationDialog : AppCompatDialogFragment() {
         Toasty.success(context, "Added", Toasty.LENGTH_SHORT, true).show()
     }
 
-    private fun showErrorToast(context: Context, msg: String) {
+    private fun showErrorToast(context: Context, msg: String?) {
         val errorMsg = when (msg) {
             NO_CONNECTION -> "No Connection"
             LIMIT_REACHED -> "SubReddit Limit Reached (12 Max)"
