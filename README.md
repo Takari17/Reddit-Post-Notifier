@@ -26,12 +26,14 @@ You can download it from the playstore [right here.](https://play.google.com/sto
 - [Dagger2](https://dagger.dev/) - handles dependency injection/management.
 - [Retrofit2 & OkHttp3](https://github.com/square/retrofit) - abstracts complexity of REST API communication.
   - [GSON Converter](https://github.com/square/retrofit/tree/master/retrofit-converters/gson) - handles serialization and deserialization to and from JSON.
-  - [Rx Call Adapter Factory](https://github.com/square/retrofit/tree/master/retrofit-adapters/rxjava2) - allows Retrofit to return RxJava Observables.
-- [RxJava](https://github.com/ReactiveX/RxJava) - used for composing asynchronous and event based operations. Also handles multi-threading.
-  - [RxKotlin](https://github.com/ReactiveX/RxKotlin) - adds new Kotlin extension functions.
-  - [RxAndroid](https://github.com/ReactiveX/RxAndroid) - gives Schedulers access to the MainThread.
-  - [RxBindings](https://github.com/JakeWharton/RxBinding) - Binds UI widgets to Observables.
-  - [RxRelay](https://github.com/JakeWharton/RxRelay) - adds Relays which are essentially Subjects without termination events.
+  - ~[Rx Call Adapter Factory](https://github.com/square/retrofit/tree/master/retrofit-adapters/rxjava2) - allows Retrofit to return RxJava Observables.~
+- ~[RxJava](https://github.com/ReactiveX/RxJava) - used for composing asynchronous and event based operations. Also handles multi-threading.~
+  - ~[RxKotlin](https://github.com/ReactiveX/RxKotlin) - adds new Kotlin extension functions.~
+  - ~[RxAndroid](https://github.com/ReactiveX/RxAndroid) - gives Schedulers access to the MainThread.~
+  - ~[RxBindings](https://github.com/JakeWharton/RxBinding) - Binds UI widgets to Observables.~
+  - ~[RxRelay](https://github.com/JakeWharton/RxRelay) - adds Relays which are essentially Subjects without termination events.~
+- [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) - used for reducing the complexity of asynchronous code and concurrency.
+- [Kotlin Flow](https://kotlinlang.org/docs/reference/coroutines/flow.html) - used for simplistic cold observables
 - [Toasty](https://github.com/GrenderG/Toasty) - creates beautiful custom made Toast with background colors, icons, etc.
 - [Room](https://developer.android.com/training/data-storage/room) - abstracts the complexity of managing SQL databases
 - [Android KTX](https://developer.android.com/kotlin/ktx) - a set of Kotlin extensions.
