@@ -10,22 +10,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takari.redditpostnotifier.App
-import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.data.subreddit.SubRedditData
+import com.takari.redditpostnotifier.databinding.FragmentObservingBinding
 import com.takari.redditpostnotifier.misc.injectViewModel
-import com.takari.redditpostnotifier.misc.logD
 import com.takari.redditpostnotifier.misc.openRedditPost
 import com.takari.redditpostnotifier.misc.prependBaseUrlIfCrossPost
 import com.takari.redditpostnotifier.ui.common.SharedViewModel
 import com.takari.redditpostnotifier.ui.history.NewPostAdapter
 import com.takari.redditpostnotifier.ui.post.service.NewPostService
-import kotlinx.android.synthetic.main.fragment_observing.*
-import kotlinx.coroutines.launch
 
 
 class NewPostFragment : Fragment() {
@@ -34,20 +30,21 @@ class NewPostFragment : Fragment() {
     private val subIconAdapter = ChosenSubRedditAdapter()
     private val serviceIntent by lazy { Intent(context, NewPostService::class.java) }
     private lateinit var newPostAdapter: NewPostAdapter
+    private val binding by lazy { FragmentObservingBinding.inflate(layoutInflater) }
 
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_observing, container, false)
+    ): View {
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        stopObservingButton.setOnClickListener {
+        binding.stopObservingButton.setOnClickListener {
             viewModel.switchContainers(SharedViewModel.FragmentName.SubRedditFragment)
             requireContext().stopService(serviceIntent)
         }
@@ -59,13 +56,13 @@ class NewPostFragment : Fragment() {
             viewModel.deleteDbPostData(clickedPostData)
         }
 
-        subRedditIconRecyclerView.apply {
+        binding.subRedditIconRecyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = subIconAdapter
         }
 
-        postHistoryRecyclerView.apply {
+        binding.postHistoryRecyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = newPostAdapter
@@ -106,7 +103,8 @@ class NewPostFragment : Fragment() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val swipedPostData = newPostAdapter.getPostData(viewHolder.adapterPosition)
-            swipedPostData?.let { viewModel.deleteDbPostData(swipedPostData) } }
+            swipedPostData?.let { viewModel.deleteDbPostData(swipedPostData) }
+        }
     })
 
     private fun startService() {
@@ -133,9 +131,10 @@ class NewPostFragment : Fragment() {
             val postDataService = (service as NewPostService.LocalBinder).getService()
 
             //Service is already in the main thread
-            postDataService.observeCurrentTime().observe(viewLifecycleOwner, Observer { timeInSeconds ->
-                timerTextView.text = "Connecting In: $timeInSeconds secs"
-            })
+            postDataService.observeCurrentTime()
+                .observe(viewLifecycleOwner, Observer { timeInSeconds ->
+                    binding.timerTextView.text = "Connecting In: $timeInSeconds secs"
+                })
 
             postDataService.onServiceDestroy = {
                 viewModel.switchContainers(SharedViewModel.FragmentName.SubRedditFragment)

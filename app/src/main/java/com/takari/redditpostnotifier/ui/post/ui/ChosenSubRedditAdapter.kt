@@ -1,7 +1,6 @@
 package com.takari.redditpostnotifier.ui.post.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -11,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.api.load
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.data.subreddit.SubRedditData
-import kotlinx.android.synthetic.main.icon_adapter_layout.view.*
+import com.takari.redditpostnotifier.databinding.IconAdapterLayoutBinding
 
 
 class ChosenSubRedditAdapter : ListAdapter<SubRedditData, ChosenSubRedditAdapter.ViewHolder>(
@@ -19,11 +18,11 @@ class ChosenSubRedditAdapter : ListAdapter<SubRedditData, ChosenSubRedditAdapter
 ) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = IconAdapterLayoutBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
 
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.icon_adapter_layout, parent, false)
-
-        return ViewHolder(view)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -36,9 +35,10 @@ class ChosenSubRedditAdapter : ListAdapter<SubRedditData, ChosenSubRedditAdapter
         holder.subRedditName.text = getItem(position).prefixedName
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val icon: ImageView = itemView.icon
-        val subRedditName: TextView = itemView.subRedditName
+    inner class ViewHolder(binding: IconAdapterLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        val icon: ImageView = binding.icon
+        val subRedditName: TextView = binding.subRedditName
     }
 
     private class SubRedditDiffCallback : DiffUtil.ItemCallback<SubRedditData>() {

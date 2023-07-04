@@ -9,13 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.R
+import com.takari.redditpostnotifier.databinding.PostDataActivityBinding
 import com.takari.redditpostnotifier.misc.injectViewModel
 import com.takari.redditpostnotifier.ui.history.PostHistoryActivity
 import com.takari.redditpostnotifier.ui.post.service.NewPostService
 import com.takari.redditpostnotifier.ui.post.ui.NewPostFragment
 import com.takari.redditpostnotifier.ui.settings.SettingsActivity
 import com.takari.redditpostnotifier.ui.subreddit.ui.SubRedditFragment
-import kotlinx.android.synthetic.main.post_data_activity.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,11 +28,14 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by injectViewModel { App.applicationComponent().sharedViewModel }
     private lateinit var subRedditFragment: Fragment
     private lateinit var newPostFragment: Fragment
+    private lateinit var binding: PostDataActivityBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.post_data_activity)
+        binding = PostDataActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         window.navigationBarColor = Color.parseColor("#171A23")
 
         //checks if fragments already exist to avoid creating duplicates
@@ -52,13 +55,13 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.switchContainers = { fragmentName ->
             when (fragmentName) {
-                SharedViewModel.FragmentName.SubRedditFragment ->
-                    if (!subRedditFragment.isAdded)
-                        switchToSubRedditFragment()
+                SharedViewModel.FragmentName.SubRedditFragment -> {
+                    if (!subRedditFragment.isAdded) switchToSubRedditFragment()
+                }
 
-                SharedViewModel.FragmentName.NewPostFragment ->
-                    if (!newPostFragment.isAdded)
-                        switchToNewPostFragment()
+                SharedViewModel.FragmentName.NewPostFragment -> {
+                    if (!newPostFragment.isAdded) switchToNewPostFragment()
+                }
             }
         }
     }
@@ -70,12 +73,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
         when (item.itemId) {
             R.id.postHistoryItem -> {
                 val postHistoryIntent = Intent(this, PostHistoryActivity::class.java)
                 startActivity(postHistoryIntent)
             }
+
             R.id.settingsOption -> {
                 val settingsIntent = Intent(this, SettingsActivity::class.java)
                 startActivity(settingsIntent)
@@ -88,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     private fun addInitialFragment(fragment: Fragment, tag: String) {
         supportFragmentManager
             .beginTransaction()
-            .add(container.id, fragment, tag)
+            .add(binding.container.id, fragment, tag)
             .commit()
     }
 
@@ -96,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(R.anim.slide_up_in, R.anim.slide_up_out)
-            .replace(container.id, subRedditFragment, SUB_REDDIT_FRAGMENT)
+            .replace(binding.container.id, subRedditFragment, SUB_REDDIT_FRAGMENT)
             .commit()
     }
 
@@ -104,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(R.anim.slide_down_in, R.anim.slide_down_out)
-            .replace(container.id, newPostFragment, OBSERVING_FRAGMENT)
+            .replace(binding.container.id, newPostFragment, OBSERVING_FRAGMENT)
             .commit()
     }
 }

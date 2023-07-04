@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.R
+import com.takari.redditpostnotifier.databinding.FragmentPostDataBinding
 import com.takari.redditpostnotifier.misc.injectViewModel
 import com.takari.redditpostnotifier.ui.common.SharedViewModel
-import kotlinx.android.synthetic.main.fragment_post_data.*
-import kotlinx.coroutines.delay
-import java.util.concurrent.TimeUnit
 
 class SubRedditFragment : Fragment() {
 
@@ -30,23 +28,24 @@ class SubRedditFragment : Fragment() {
         viewModel.deleteDbSubRedditData(clickedSubData)
     }
 
+    private val binding by lazy { FragmentPostDataBinding.inflate(layoutInflater) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_post_data, container, false)
+    ): View {
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeButton.setOnClickListener {
+        binding.observeButton.setOnClickListener {
             viewModel.switchContainers(SharedViewModel.FragmentName.NewPostFragment)
         }
 
-        addSubRedditFab.setOnClickListener {
+        binding.addSubRedditFab.setOnClickListener {
             if (!validationDialog.isAdded)
                 validationDialog.show(
                     activity?.supportFragmentManager!!,
@@ -68,11 +67,13 @@ class SubRedditFragment : Fragment() {
             queuedSubredditsAdapter.submitList(subRedditDataList.reversed())
 
             //without a delay the recycler view wouldn't scroll to the new item for whatever reason
-            handler.postDelayed({ queuedSubRedditRecyclerView
-                .smoothScrollToPosition(0) }, 500)
+            handler.postDelayed({
+                queuedSubRedditRecyclerView
+                    .smoothScrollToPosition(0)
+            }, 500)
 
             //disabled if there's no data in the db
-            observeButton.isEnabled = subRedditDataList.isNotEmpty()
+            binding.observeButton.isEnabled = subRedditDataList.isNotEmpty()
 
             //will be received by NewPostFragment
             viewModel.subRedditDataList = subRedditDataList

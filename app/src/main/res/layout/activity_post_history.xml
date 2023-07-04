@@ -23,7 +23,7 @@
             tools:visibility="invisible" />
 
 
-    <mehdi.sakout.fancybuttons.FancyButton
+    <Button
             android:id="@+id/deleteAllButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -35,13 +35,7 @@
             app:layout_constraintBottom_toTopOf="@+id/nothingFoundIcon"
             app:layout_constraintEnd_toStartOf="@+id/guideline14"
             app:layout_constraintStart_toStartOf="@+id/guideline15"
-            app:layout_constraintTop_toTopOf="parent"
-            fancy:fb_borderWidth="5dp"
-            fancy:fb_defaultColor="@color/colorAccent"
-            fancy:fb_disabledBorderColor="#0D250D"
-            fancy:fb_disabledColor="#0D250D"
-            fancy:fb_focusColor="@color/colorPrimaryLight"
-            fancy:fb_radius="40dp" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
             android:id="@+id/nothingFoundIcon"

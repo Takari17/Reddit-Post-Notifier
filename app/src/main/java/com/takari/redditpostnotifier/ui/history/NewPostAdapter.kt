@@ -1,47 +1,52 @@
 package com.takari.redditpostnotifier.ui.history
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.data.post.PostData
-import com.takari.redditpostnotifier.ui.history.NewPostAdapter.MainViewHolder
-import kotlinx.android.synthetic.main.post_data_layout.view.*
+import com.takari.redditpostnotifier.databinding.PostDataLayoutBinding
+import com.takari.redditpostnotifier.ui.history.NewPostAdapter.NewPostViewHolder
 import javax.inject.Inject
 
 
 class NewPostAdapter @Inject constructor(private val onClick: (PostData) -> Unit) :
-    ListAdapter<PostData, MainViewHolder>(PostDataDiffCallback()) {
+    ListAdapter<PostData, NewPostViewHolder>(PostDataDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.post_data_layout, parent, false)
-        return MainViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewPostViewHolder {
+        val binding = PostDataLayoutBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+
+        return NewPostViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: NewPostViewHolder, position: Int) {
         holder.apply {
             title.text = getItem(position).title
-            postInfo.text = "u/${getItem(position).author} from r/${getItem(position).subReddit} posted:"
+            postInfo.text =
+                "u/${getItem(position).author} from r/${getItem(position).subReddit} posted:" //todo
         }
     }
 
-    inner class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val title: TextView = itemView.postTitleTextView
-        val postInfo: TextView = itemView.postInfoTextView
+
+    fun getPostData(adapterPosition: Int): PostData? = getItem(adapterPosition)
+
+    inner class NewPostViewHolder(binding: PostDataLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        val title: TextView = binding.postTitleTextView
+        val postInfo: TextView = binding.postInfoTextView
 
         init {
-            itemView.setOnClickListener {
+            binding.root.setOnClickListener {
                 val clickedPostData = getItem(adapterPosition)
                 onClick(clickedPostData)
             }
         }
     }
-
-    fun getPostData(adapterPosition: Int): PostData? = getItem(adapterPosition)
 
     private class PostDataDiffCallback : DiffUtil.ItemCallback<PostData>() {
         override fun areItemsTheSame(oldItem: PostData, newItem: PostData): Boolean {

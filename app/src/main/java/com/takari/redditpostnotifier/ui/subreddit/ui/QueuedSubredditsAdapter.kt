@@ -1,7 +1,6 @@
 package com.takari.redditpostnotifier.ui.subreddit.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.api.load
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.data.subreddit.SubRedditData
-import kotlinx.android.synthetic.main.queued_subreddits_layout.view.*
+import com.takari.redditpostnotifier.databinding.QueuedSubredditsLayoutBinding
 
 
 class QueuedSubredditsAdapter(
@@ -42,7 +41,11 @@ class QueuedSubredditsAdapter(
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.queued_subreddits_layout, parent, false)
 
-        return ViewHolder(view)
+        val binding = QueuedSubredditsLayoutBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -56,10 +59,11 @@ class QueuedSubredditsAdapter(
         }
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val iconImageView: ImageView = itemView.iconImageView
-        val subRedditTextName: TextView = itemView.subRedditTextName
-        val descriptionTextView: TextView = itemView.descriptionTextView
+    inner class ViewHolder(binding: QueuedSubredditsLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        val iconImageView: ImageView = binding.iconImageView
+        val subRedditTextName: TextView = binding.subRedditTextName
+        val descriptionTextView: TextView = binding.descriptionTextView
     }
 
     fun attachOnSwipe(recyclerView: RecyclerView) {

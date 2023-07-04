@@ -9,7 +9,7 @@
         tools:context=".ui.post.ui.NewPostFragment">
 
 
-    <mehdi.sakout.fancybuttons.FancyButton
+    <Button
             android:id="@+id/stopObservingButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -21,11 +21,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/postHistoryRecyclerView"
             app:layout_constraintTop_toTopOf="@+id/guideline11"
-            app:layout_constraintVertical_bias="0.384"
-            fancy:fb_borderWidth="5dp"
-            fancy:fb_defaultColor="@color/colorAccent"
-            fancy:fb_focusColor="@color/colorPrimaryLight"
-            fancy:fb_radius="40dp" />
+            app:layout_constraintVertical_bias="0.384" />
 
     <TextView
             android:id="@+id/subNameTextView"

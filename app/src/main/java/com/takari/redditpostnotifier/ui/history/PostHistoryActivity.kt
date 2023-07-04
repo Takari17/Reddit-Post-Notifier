@@ -13,11 +13,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takari.redditpostnotifier.App
-import com.takari.redditpostnotifier.R
+import com.takari.redditpostnotifier.databinding.ActivityPostHistoryBinding
 import com.takari.redditpostnotifier.misc.injectViewModel
 import com.takari.redditpostnotifier.misc.openRedditPost
 import com.takari.redditpostnotifier.misc.prependBaseUrlIfCrossPost
-import kotlinx.android.synthetic.main.activity_post_history.*
 
 
 class PostHistoryActivity : AppCompatActivity() {
@@ -25,11 +24,13 @@ class PostHistoryActivity : AppCompatActivity() {
     private val viewModel: PostHistoryViewModel by injectViewModel { App.applicationComponent().postHistoryViewModel }
     private val confirmationDialog = ConfirmationDialog()
     private lateinit var newPostAdapter: NewPostAdapter
-
+    private lateinit var binding: ActivityPostHistoryBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_post_history)
+        binding = ActivityPostHistoryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         window.navigationBarColor = Color.parseColor("#171A23")
 
@@ -40,14 +41,14 @@ class PostHistoryActivity : AppCompatActivity() {
             viewModel.deleteDbPostData(clickedPostData)
         }
 
-        postHistoryRecyclerView.apply {
+        binding.postHistoryRecyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = newPostAdapter
             swipeHandler.attachToRecyclerView(this)
         }
 
-        deleteAllButton.setOnClickListener {
+        binding.deleteAllButton.setOnClickListener {
             if (!confirmationDialog.isAdded)
                 confirmationDialog.show(supportFragmentManager, "ConfirmationDialog")
         }
@@ -68,23 +69,23 @@ class PostHistoryActivity : AppCompatActivity() {
     }
 
     private fun showPostHistoryViews() {
-        postHistoryRecyclerView.visibility = View.VISIBLE
+        binding.postHistoryRecyclerView.visibility = View.VISIBLE
 
-        deleteAllButton.visibility = View.VISIBLE
-        deleteAllButton.isEnabled = true
+        binding.deleteAllButton.visibility = View.VISIBLE
+        binding.deleteAllButton.isEnabled = true
 
-        nothingFoundIcon.visibility = View.INVISIBLE
-        nothingFoundText.visibility = View.INVISIBLE
+        binding.nothingFoundIcon.visibility = View.INVISIBLE
+        binding.nothingFoundText.visibility = View.INVISIBLE
     }
 
     private fun showNothingFoundViews() {
-        postHistoryRecyclerView.visibility = View.INVISIBLE
+        binding.postHistoryRecyclerView.visibility = View.INVISIBLE
 
-        deleteAllButton.visibility = View.INVISIBLE
-        deleteAllButton.isEnabled = false
+        binding.deleteAllButton.visibility = View.INVISIBLE
+        binding.deleteAllButton.isEnabled = false
 
-        nothingFoundIcon.visibility = View.VISIBLE
-        nothingFoundText.visibility = View.VISIBLE
+        binding.nothingFoundIcon.visibility = View.VISIBLE
+        binding.nothingFoundText.visibility = View.VISIBLE
     }
 
     private val swipeHandler = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(

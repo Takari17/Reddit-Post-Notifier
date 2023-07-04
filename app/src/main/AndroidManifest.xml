@@ -20,30 +20,34 @@
             android:theme="@style/AppTheme">
         <activity
                 android:name="com.takari.redditpostnotifier.ui.history.PostHistoryActivity"
-                android:exported="true"></activity>
+                android:exported="true" />
+
         <activity
                 android:name="com.takari.redditpostnotifier.ui.settings.SettingsActivity"
                 android:configChanges="orientation|keyboardHidden"
                 android:exported="true"
                 android:label="@string/title_activity_settings"
-                android:screenOrientation="portrait"></activity>
+                android:screenOrientation="fullSensor" />
+
         <activity
                 android:name="com.takari.redditpostnotifier.ui.common.MainActivity"
                 android:configChanges="orientation|keyboardHidden"
                 android:exported="true"
                 android:launchMode="singleTop"
-                android:screenOrientation="portrait"
+                android:screenOrientation="fullSensor"
                 android:windowSoftInputMode="adjustPan">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <service android:name="com.takari.redditpostnotifier.ui.post.service.NewPostService" />
-
         <receiver android:name="com.takari.redditpostnotifier.ui.post.service.NewPostReceiver" />
+
     </application>
 
 </manifest>

@@ -9,11 +9,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.takari.redditpostnotifier.App
-import com.takari.redditpostnotifier.R
+import com.takari.redditpostnotifier.databinding.SettingsActivityBinding
 import com.takari.redditpostnotifier.misc.injectViewModel
 import com.takari.redditpostnotifier.ui.post.service.NewPostService
 import es.dmoral.toasty.Toasty
-import kotlinx.android.synthetic.main.settings_activity.*
 
 /*
 Preference Settings was WAY too complicated and over engineered so I said fuck it and made my
@@ -27,28 +26,29 @@ class SettingsActivity : AppCompatActivity() {
 
     private val viewModel: SettingsViewModel by injectViewModel { App.applicationComponent().settingsViewModel }
     private val apiRequestRateDialog = ApiRequestRateDialog()
+    private val binding by lazy { SettingsActivityBinding.inflate(layoutInflater) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.settings_activity)
+        setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         window.navigationBarColor = Color.parseColor("#171A23")
 
         val initialApiRequestRate = viewModel.getIntFromSharedPrefs(API_REQUEST_RATE_KEY, 1)
 
-        displayedApiRequestRateTextView.text = "Every $initialApiRequestRate min"
+        binding.displayedApiRequestRateTextView.text = "Every $initialApiRequestRate min"
 
-        cardViewBackground.setOnClickListener {
+        binding.cardViewBackground.setOnClickListener {
             if (!apiRequestRateDialog.isAdded)
                 apiRequestRateDialog.show(supportFragmentManager, "ApiRequestRateDialog")
         }
 
         apiRequestRateDialog.onItemSelected = { apiRequestRateInMinutes ->
-            displayedApiRequestRateTextView.text = "Every $apiRequestRateInMinutes min"
+            binding.displayedApiRequestRateTextView.text = "Every $apiRequestRateInMinutes min"
             viewModel.saveIntToSharedPrefs(API_REQUEST_RATE_KEY, apiRequestRateInMinutes)
 
-            if(NewPostService.isRunning())
+            if (NewPostService.isRunning())
                 Toasty.warning(this, "Stop observing to take effect", Toast.LENGTH_SHORT).show()
         }
     }

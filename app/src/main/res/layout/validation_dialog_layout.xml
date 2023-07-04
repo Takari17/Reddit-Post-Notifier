@@ -56,7 +56,7 @@
             app:lottie_fileName="error-animation.json"
             tools:srcCompat="@drawable/red_x" />
 
-    <mehdi.sakout.fancybuttons.FancyButton
+    <Button
             android:id="@+id/validationButton"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -64,11 +64,7 @@
             android:text="Validate SubReddit"
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="@+id/guideline7"
-            app:layout_constraintTop_toBottomOf="@+id/subRedditName"
-            fancy:fb_borderWidth="5dp"
-            fancy:fb_defaultColor="@color/colorAccent"
-            fancy:fb_focusColor="@color/colorPrimaryLight"
-            fancy:fb_radius="40dp" />
+            app:layout_constraintTop_toBottomOf="@+id/subRedditName" />
 
     <ProgressBar
             android:id="@+id/progressBar2"

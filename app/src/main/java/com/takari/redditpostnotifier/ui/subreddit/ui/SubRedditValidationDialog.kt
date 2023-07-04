@@ -6,15 +6,12 @@ import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
-import android.widget.Button
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.core.animation.doOnEnd
 import androidx.lifecycle.viewModelScope
-import com.airbnb.lottie.LottieAnimationView
-import com.google.android.material.textfield.TextInputLayout
 import com.takari.redditpostnotifier.App
-import com.takari.redditpostnotifier.R
+import com.takari.redditpostnotifier.databinding.ValidationDialogLayoutBinding
 import com.takari.redditpostnotifier.misc.ResponseState
 import com.takari.redditpostnotifier.misc.injectViewModel
 import com.takari.redditpostnotifier.ui.common.SharedViewModel
@@ -22,65 +19,54 @@ import com.takari.redditpostnotifier.ui.common.SharedViewModel.Companion.LIMIT_R
 import com.takari.redditpostnotifier.ui.common.SharedViewModel.Companion.NO_CONNECTION
 import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import mehdi.sakout.fancybuttons.FancyButton
 
 
 class SubRedditValidationDialog : AppCompatDialogFragment() {
 
     private val viewModel: SharedViewModel by injectViewModel { App.applicationComponent().sharedViewModel } // do we need to scope our dependencies?
-    private lateinit var successAnim: LottieAnimationView
-    private lateinit var errorAnim: LottieAnimationView
+    private lateinit var binding: ValidationDialogLayoutBinding
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         AlertDialog.Builder(activity).apply {
-            val view = requireActivity().layoutInflater.inflate(R.layout.validation_dialog_layout, null)
-            setView(view)
+            binding = ValidationDialogLayoutBinding.inflate(layoutInflater)
+            setView(binding.root)
 
-            //Kotlin synthetics failed me ;(
-            val validationButton = view.findViewById<FancyButton>(R.id.validationButton)
-            val finishedButton = view.findViewById<Button>(R.id.finishedButton)
-            val progressBar = view.findViewById<ProgressBar>(R.id.progressBar2)
-            val subRedditName = view.findViewById<TextInputLayout>(R.id.subRedditName)
-            successAnim = view.findViewById(R.id.successAnim)
-            errorAnim = view.findViewById(R.id.errorAnim)
-
-            successAnim.addAnimatorUpdateListener { valueAnimator ->
-                valueAnimator.doOnEnd { successAnim.visibility = View.INVISIBLE }
+            binding.successAnim.addAnimatorUpdateListener { valueAnimator ->
+                valueAnimator.doOnEnd { binding.successAnim.visibility = View.INVISIBLE }
             }
 
-            errorAnim.addAnimatorUpdateListener { valueAnimator ->
-                valueAnimator.doOnEnd { errorAnim.visibility = View.INVISIBLE }
+            binding.errorAnim.addAnimatorUpdateListener { valueAnimator ->
+                valueAnimator.doOnEnd { binding.errorAnim.visibility = View.INVISIBLE }
             }
 
-            subRedditName.editText!!.setOnKeyListener { _, keyCode, event ->
+            binding.subRedditName.editText!!.setOnKeyListener { _, keyCode, event ->
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
                     //on keyboard "enter" key click
-                    validationButton.performClick()
+                    binding.validationButton.performClick()
                 }
                 false
             }
 
-            finishedButton.setOnClickListener { dismiss() }
+            binding.finishedButton.setOnClickListener { dismiss() }
 
-            validationButton.setOnClickListener {
-                val subName = subRedditName.editText!!.text.toString()
+            binding.validationButton.setOnClickListener {
+                val subName = binding.subRedditName.editText!!.text.toString()
 
                 viewModel.viewModelScope.launch {
                     viewModel.getAndCacheSubRedditData(subName)
                         .flowOn(Dispatchers.Main)
                         .onStart {
-                            progressBar.show()
-                            validationButton.isEnabled = false
+                            binding.progressBar2.show()
+                            binding.validationButton.isEnabled = false
                         }
                         .onCompletion {
-                            progressBar.hide()
-                            validationButton.isEnabled = true
+                            binding.progressBar2.hide()
+                            binding.validationButton.isEnabled = true
                         }
                         .collect { response ->
                             when (response) {
@@ -88,6 +74,7 @@ class SubRedditValidationDialog : AppCompatDialogFragment() {
                                     showSuccessAnimation()
                                     showSuccessToast(context)
                                 }
+
                                 is ResponseState.Error -> {
                                     showErrorAnimation()
                                     showErrorToast(context, response.e.message)
@@ -109,7 +96,7 @@ class SubRedditValidationDialog : AppCompatDialogFragment() {
 
     private fun showSuccessAnimation() {
         //anim won't start unless the view is visible
-        successAnim.apply {
+        binding.successAnim.apply {
             speed = .5f
             visibility = View.VISIBLE
             playAnimation()
@@ -117,7 +104,7 @@ class SubRedditValidationDialog : AppCompatDialogFragment() {
     }
 
     private fun showErrorAnimation() {
-        errorAnim.apply {
+        binding.errorAnim.apply {
             speed = .5f
             visibility = View.VISIBLE
             playAnimation()
