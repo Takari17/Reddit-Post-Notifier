@@ -38,26 +38,33 @@ class Repository @Inject constructor(
         postDataDao.insertReplace(post)
     }
 
-    fun listenToPostDataInDb(): Flow<List<PostData>> =
-        postDataDao.listenForPostData()
+    fun listenToPostDataInDb(): Flow<List<PostData>> {
+        return postDataDao.listenForPostData()
+    }
 
-    suspend fun deletePostDataInDb(postData: PostData): Unit =
-        postDataDao.deleteItem(postData)
+    suspend fun deletePostDataInDb(postData: PostData) {
+        return postDataDao.deleteItem(postData)
+    }
 
-    suspend fun deleteAllDbPostData(): Unit =
+    suspend fun deleteAllDbPostData(): Unit {
         postDataDao.deleteAll()
+    }
 
-    suspend fun insertSubRedditDataInDb(subRedditData: SubRedditData) =
+    suspend fun insertSubRedditDataInDb(subRedditData: SubRedditData) {
         subRedditDataDao.insertReplace(subRedditData)
+    }
 
-    fun listenToDbSubRedditData(): Flow<List<SubRedditData>> =
-        subRedditDataDao.listenToSubRedditData()
+    fun listenToDbSubRedditData(): Flow<List<SubRedditData>> {
+        return subRedditDataDao.listenToSubRedditData()
+    }
 
-    suspend fun getCurrentDbSubRedditData(): List<SubRedditData> =
-        subRedditDataDao.getCurrentSubRedditData()
+    suspend fun getCurrentDbSubRedditData(): List<SubRedditData> {
+        return subRedditDataDao.getCurrentSubRedditData()
+    }
 
-    suspend fun deleteDbSubRedditData(subRedditData: SubRedditData): Unit =
+    suspend fun deleteDbSubRedditData(subRedditData: SubRedditData): Unit {
         subRedditDataDao.deleteItem(subRedditData)
+    }
 
     fun getIntFromSharedPrefs(key: String, defaultValue: Int): Int =
         sharedPrefs.getInt(key, defaultValue)
