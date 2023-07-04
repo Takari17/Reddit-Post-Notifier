@@ -9,7 +9,6 @@ import com.takari.redditpostnotifier.data.subreddit.SubRedditData
 import com.takari.redditpostnotifier.misc.ResponseState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,8 +18,9 @@ import javax.inject.Inject
 class SharedViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     companion object {
-        const val LIMIT_REACHED = "Limit Reached"
-        const val NO_CONNECTION = "Unable to resolve host \"www.reddit.com\": No address associated with hostname"
+        const val LIMIT_REACHED = "Limit Reached" //todo string resource
+        const val NO_CONNECTION =  //todo string resource
+            "Unable to resolve host \"www.reddit.com\": No address associated with hostname"
     }
 
     var switchContainers: (FragmentName) -> Unit = {}
@@ -36,23 +36,23 @@ class SharedViewModel @Inject constructor(private val repository: Repository) : 
             .collect { subDataList -> emit(subDataList) }
     }
 
-
     fun deleteDbPostData(postData: PostData) {
         viewModelScope.launch { repository.deletePostDataInDb(postData) }
     }
 
     fun getAndCacheSubRedditData(subName: String): Flow<ResponseState<Unit>> = flow {
-        insertDbSubRedditDataWithCap(repository.getSubRedditData(subName))
-        emit(ResponseState.Success(Unit))
-    }.catch<ResponseState<Unit>> { e -> emit(ResponseState.Error(e)) }
+        val subRedditData = repository.getSubRedditData(subName)
 
-    fun insertDbSubRedditDataWithCap(subRedditData: SubRedditData) {
-        viewModelScope.launch {
-            val currentSubData = repository.getCurrentDbSubRedditData()
-            if (currentSubData.size >= 12) throw Exception(LIMIT_REACHED)
-            else repository.insertSubRedditDataInDb(subRedditData)
+        val currentSubRedditSize = repository.getCurrentDbSubRedditData().size
+
+        if (currentSubRedditSize >= 12) {
+            emit(ResponseState.Error(Exception(LIMIT_REACHED)))
+        } else {
+            repository.insertSubRedditDataInDb(subRedditData)
+            emit(ResponseState.Success(Unit))
         }
-    }
+
+    }.catch { e -> emit(ResponseState.Error(e)) }
 
     fun deleteDbSubRedditData(subRedditData: SubRedditData) {
         viewModelScope.launch { repository.deleteDbSubRedditData(subRedditData) }

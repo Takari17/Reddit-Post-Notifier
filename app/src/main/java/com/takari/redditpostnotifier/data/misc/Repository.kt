@@ -31,8 +31,12 @@ class Repository @Inject constructor(
         }
     }
 
-    suspend fun getSubRedditData(name: String): SubRedditData =
-        redditApi.getSubRedditData(name).data
+    /**
+     * TODO write docs here
+     */
+    suspend fun getSubRedditData(name: String): SubRedditData {
+        return redditApi.getSubRedditData(name).data
+    }
 
     suspend fun insertPostDataInDb(post: PostData) = withContext(Dispatchers.Default) {
         postDataDao.insertReplace(post)

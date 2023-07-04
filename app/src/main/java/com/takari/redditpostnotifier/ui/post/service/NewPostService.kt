@@ -56,6 +56,8 @@ class NewPostService : Service() {
     /*Only invoked on initialization and on reset.*/
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+        logD("SERVICE STARTED ----------------------------------------")
+
         if (intent!!.action == RESET) {
             destroyService()
             return START_NOT_STICKY
@@ -181,17 +183,17 @@ class NewPostService : Service() {
         val receiverIntent = Intent(this, NewPostReceiver::class.java).apply {
             action = RESET
         }
-        PendingIntent.getBroadcast(this, 2, receiverIntent, 0)
+        PendingIntent.getBroadcast(this, 2, receiverIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private val postHistoryIntent: PendingIntent by lazy {
         val intent = Intent(this, PostHistoryActivity::class.java)
-        PendingIntent.getActivity(this, 0, intent, 0)
+        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private val activityIntent: PendingIntent by lazy {
         val intent = Intent(this, MainActivity::class.java)
-        PendingIntent.getActivity(this, 0, intent, 0)
+        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 }
 
