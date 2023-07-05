@@ -2,42 +2,62 @@ package com.takari.redditpostnotifier.features.reddit.newPostHistory
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.graphics.Color
 import android.os.Bundle
-import android.view.MenuItem
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takari.redditpostnotifier.App
+import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.databinding.ActivityPostHistoryBinding
+import com.takari.redditpostnotifier.databinding.SettingsActivityBinding
 import com.takari.redditpostnotifier.utils.injectViewModel
+import com.takari.redditpostnotifier.utils.logD
 import com.takari.redditpostnotifier.utils.openRedditPost
 import com.takari.redditpostnotifier.utils.prependBaseUrlIfCrossPost
 
+class PostHistoryFragment : Fragment() {
 
-class PostHistoryActivity : AppCompatActivity() {
+    companion object {
+        const val TAG = "Post History"
+    }
 
     private val viewModel: PostHistoryViewModel by injectViewModel { App.applicationComponent().postHistoryViewModel }
     private val confirmationDialog = ConfirmationDialog()
     private lateinit var newPostAdapter: NewPostAdapter
-    private lateinit var binding: ActivityPostHistoryBinding
+    private val binding by lazy { ActivityPostHistoryBinding.inflate(layoutInflater) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityPostHistoryBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        // Adds the back button to the action bar and changes it's name
+
+        val supportActionBar = (requireActivity() as AppCompatActivity).supportActionBar
+
+        supportActionBar?.title = resources.getString(R.string.post_history)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        window.navigationBarColor = Color.parseColor("#171A23")
+
+        setHasOptionsMenu(true)
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         newPostAdapter = NewPostAdapter { clickedPostData ->
 
             val url = prependBaseUrlIfCrossPost(clickedPostData)
-            this.openRedditPost(url)
+            requireContext().openRedditPost(url)
             viewModel.deleteDbPostData(clickedPostData)
         }
 
@@ -50,12 +70,15 @@ class PostHistoryActivity : AppCompatActivity() {
 
         binding.deleteAllButton.setOnClickListener {
             if (!confirmationDialog.isAdded)
-                confirmationDialog.show(supportFragmentManager, "ConfirmationDialog")
+                confirmationDialog.show(
+                    requireActivity().supportFragmentManager,
+                    "ConfirmationDialog"
+                )
         }
 
         confirmationDialog.onYesSelect = { viewModel.deleteAllDbPostData() }
 
-        viewModel.dbPostData.observe(this, Observer { postDataList ->
+        viewModel.dbPostData.observe(viewLifecycleOwner, Observer { postDataList ->
             if (postDataList.isNotEmpty()) {
                 newPostAdapter.submitList(postDataList)
                 showPostHistoryViews()
@@ -63,9 +86,19 @@ class PostHistoryActivity : AppCompatActivity() {
         })
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        finish()
-        return super.onOptionsItemSelected(item)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Reverts action bar
+        val supportActionBar = (requireActivity() as AppCompatActivity).supportActionBar
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
+        supportActionBar?.title = resources.getString(R.string.app_name)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        menu.clear()
     }
 
     private fun showPostHistoryViews() {
@@ -122,5 +155,4 @@ class PostHistoryActivity : AppCompatActivity() {
 
             }.create()
     }
-
 }

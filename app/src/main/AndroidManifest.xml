@@ -18,12 +18,9 @@
             android:label="@string/app_name"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity
-                android:name="com.takari.redditpostnotifier.features.reddit.newPostHistory.PostHistoryActivity"
-                android:exported="true" />
 
         <activity
-                android:name="com.takari.redditpostnotifier.features.reddit.subreddit.ui.MainActivity"
+                android:name="com.takari.redditpostnotifier.features.MainActivity"
                 android:configChanges="orientation|keyboardHidden"
                 android:exported="true"
                 android:launchMode="singleTop"

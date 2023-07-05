@@ -4,7 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -16,7 +16,6 @@ import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.databinding.SettingsActivityBinding
 import com.takari.redditpostnotifier.features.reddit.newPost.service.NewPostService
 import com.takari.redditpostnotifier.utils.injectViewModel
-import com.takari.redditpostnotifier.utils.logD
 import es.dmoral.toasty.Toasty
 
 /*
@@ -41,9 +40,11 @@ class SettingsFragment : Fragment() {
 
         val supportActionBar = (requireActivity() as AppCompatActivity).supportActionBar
 
-        supportActionBar?.title = resources.getString(R.string.settings)
+        supportActionBar?.title = resources.getString(R.string.title_activity_settings)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        setHasOptionsMenu(true)
 
         return binding.root
     }
@@ -91,10 +92,9 @@ class SettingsFragment : Fragment() {
         supportActionBar?.title = resources.getString(R.string.app_name)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        logD("IT WAS CLICKED---------")
-        requireActivity().supportFragmentManager.popBackStack()
-        return super.onOptionsItemSelected(item)
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        menu.clear()
     }
 
     class ApiRequestRateDialog : AppCompatDialogFragment() {

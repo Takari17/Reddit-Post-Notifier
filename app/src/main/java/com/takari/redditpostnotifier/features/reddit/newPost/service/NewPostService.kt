@@ -13,10 +13,9 @@ import androidx.lifecycle.MutableLiveData
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.App.Companion.applicationComponent
 import com.takari.redditpostnotifier.R
+import com.takari.redditpostnotifier.features.MainActivity
 import com.takari.redditpostnotifier.features.reddit.newPost.models.PostData
-import com.takari.redditpostnotifier.features.reddit.newPostHistory.PostHistoryActivity
 import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
-import com.takari.redditpostnotifier.features.reddit.subreddit.ui.MainActivity
 import com.takari.redditpostnotifier.features.settings.SettingsFragment
 import com.takari.redditpostnotifier.utils.logD
 import kotlinx.coroutines.*
@@ -167,7 +166,7 @@ class NewPostService : Service() {
             setContentText(postData.title)
             setAutoCancel(true)
             setPriority(NotificationCompat.PRIORITY_HIGH)
-            setContentIntent(postHistoryIntent)
+//            setContentIntent(postHistoryIntent)
             setOnlyAlertOnce(true)
         }.build()
 
@@ -187,10 +186,10 @@ class NewPostService : Service() {
         PendingIntent.getBroadcast(this, 2, receiverIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
-    private val postHistoryIntent: PendingIntent by lazy {
-        val intent = Intent(this, PostHistoryActivity::class.java)
-        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-    }
+//    private val postHistoryIntent: PendingIntent by lazy {
+//        val intent = Intent(this, PostHistoryActivity::class.java)
+//        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+//    }
 
     private val activityIntent: PendingIntent by lazy {
         val intent = Intent(this, MainActivity::class.java)
