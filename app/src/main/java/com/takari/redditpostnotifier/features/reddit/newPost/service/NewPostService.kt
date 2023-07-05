@@ -6,23 +6,38 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.takari.redditpostnotifier.App
-import com.takari.redditpostnotifier.App.Companion.applicationComponent
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.features.MainActivity
+import com.takari.redditpostnotifier.features.reddit.data.Repository
 import com.takari.redditpostnotifier.features.reddit.newPost.models.PostData
 import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
 import com.takari.redditpostnotifier.features.settings.SettingsFragment
 import com.takari.redditpostnotifier.utils.logD
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-//Coroutines can be started from a service as long as we handle clean up. Config changes obvs wont be an issue.
+@AndroidEntryPoint
 class NewPostService : Service() {
 
     companion object {
@@ -30,7 +45,9 @@ class NewPostService : Service() {
         const val RESET = "reset"
     }
 
-    private val repository = applicationComponent().repository
+    @Inject
+    lateinit var repository: Repository
+
     private val id = 2201
     private var newPostCounter = 0
     var onServiceDestroy: (() -> Unit) = {}
@@ -38,7 +55,8 @@ class NewPostService : Service() {
         mutableListOf() //used for filtering new post from old
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val currentTime = MutableLiveData("0")
-
+    private val notificationBuilder by lazy { NotificationCompat.Builder(this, App.CHANNEL_ID) }
+    private val notificationManager by lazy { NotificationManagerCompat.from(this) }
 
     override fun onCreate() {
         super.onCreate()
@@ -49,7 +67,7 @@ class NewPostService : Service() {
         fun getService(): NewPostService = this@NewPostService
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return LocalBinder()
     }
 
@@ -78,12 +96,27 @@ class NewPostService : Service() {
 
         listenForNewPost(apiRequestRateInMillis, subNames.toTypedArray())
 
-        startForeground(id, getMainNotification("0"))
+        val session = MediaSessionCompat(this, "tag").sessionToken
+        val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(session)
+
+        val notification = notificationBuilder.apply {
+            setSmallIcon(R.drawable.notification_icon)
+            setStyle(mediaStyle)
+            setContentTitle("No New Post Found Yet")
+            setContentText("Connecting In...")
+            addAction(R.drawable.reset, "Reset", resetIntent)
+            setContentIntent(activityIntent)
+            setOnlyAlertOnce(true)
+        }.build()
+
+        startForeground(id, notification)
+
         return START_REDELIVER_INTENT
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        logD("SERVICE DESTROYED --------------------------------------------")
         running = false
         scope.cancel()
         onServiceDestroy()
@@ -148,35 +181,31 @@ class NewPostService : Service() {
 
     fun observeCurrentTime(): LiveData<String> = currentTime
 
-    private fun getMainNotification(timeInSeconds: String): Notification =
-        NotificationCompat.Builder(this, App.CHANNEL_ID).apply {
+    private fun getFoundPostNotification(postData: PostData, newPostCounter: Int): Notification {
+        val session = MediaSessionCompat(this, "tag").sessionToken
+        val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(session)
+
+        return NotificationCompat.Builder(this, App.CHANNEL_ID).apply {
             setSmallIcon(R.drawable.notification_icon)
-            setContentTitle("No New Post Found Yet")
-            setContentText("Connecting In: $timeInSeconds secs")
-            addAction(R.drawable.reset, "Reset", resetIntent)
+            setStyle(mediaStyle)
             setContentIntent(activityIntent)
-            setOnlyAlertOnce(true)
-        }.build()
-
-
-    private fun showFoundPostNotification(postData: PostData, newPostCounter: Int) =
-        NotificationCompat.Builder(this, App.CHANNEL_ID).apply {
-            setSmallIcon(R.drawable.notification_icon)
             setContentTitle("Found $newPostCounter new post!")
             setContentText(postData.title)
             setAutoCancel(true)
             setPriority(NotificationCompat.PRIORITY_HIGH)
-//            setContentIntent(postHistoryIntent)
             setOnlyAlertOnce(true)
         }.build()
+    }
 
     private fun updateNotificationTimer(timeInSeconds: String) {
-        NotificationManagerCompat.from(this).notify(id, getMainNotification(timeInSeconds))
+        notificationBuilder.setContentText("Connecting in: $timeInSeconds seconds")
+
+        notificationManager.notify(id, notificationBuilder.build())
     }
 
     private fun updateNewPostNotification(postData: PostData, newPostCounter: Int) {
-        NotificationManagerCompat.from(this)
-            .notify(238, showFoundPostNotification(postData, newPostCounter))
+        val newNotification = getFoundPostNotification(postData, newPostCounter)
+        notificationManager.notify(238, newNotification)
     }
 
     private val resetIntent: PendingIntent by lazy {

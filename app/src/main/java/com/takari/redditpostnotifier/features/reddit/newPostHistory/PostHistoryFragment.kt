@@ -5,32 +5,31 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.databinding.ActivityPostHistoryBinding
-import com.takari.redditpostnotifier.databinding.SettingsActivityBinding
-import com.takari.redditpostnotifier.utils.injectViewModel
-import com.takari.redditpostnotifier.utils.logD
 import com.takari.redditpostnotifier.utils.openRedditPost
 import com.takari.redditpostnotifier.utils.prependBaseUrlIfCrossPost
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PostHistoryFragment : Fragment() {
 
     companion object {
         const val TAG = "Post History"
     }
 
-    private val viewModel: PostHistoryViewModel by injectViewModel { App.applicationComponent().postHistoryViewModel }
+    private val viewModel: PostHistoryViewModel by activityViewModels()
     private val confirmationDialog = ConfirmationDialog()
     private lateinit var newPostAdapter: NewPostAdapter
     private val binding by lazy { ActivityPostHistoryBinding.inflate(layoutInflater) }

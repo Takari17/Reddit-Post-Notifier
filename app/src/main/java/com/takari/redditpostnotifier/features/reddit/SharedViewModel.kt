@@ -7,6 +7,7 @@ import com.takari.redditpostnotifier.features.reddit.data.Repository
 import com.takari.redditpostnotifier.features.reddit.newPost.models.PostData
 import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
 import com.takari.redditpostnotifier.utils.ResponseState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 
 //The Views pretty much only rely off of the state of the local db.
+@HiltViewModel
 class SharedViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     companion object {
@@ -23,7 +25,6 @@ class SharedViewModel @Inject constructor(private val repository: Repository) : 
             "Unable to resolve host \"www.reddit.com\": No address associated with hostname"
     }
 
-    var switchContainers: (FragmentName) -> Unit = {}
     var subRedditDataList: List<SubRedditData>? = null
 
     val dbPostData = liveData {
@@ -56,9 +57,5 @@ class SharedViewModel @Inject constructor(private val repository: Repository) : 
 
     fun deleteDbSubRedditData(subRedditData: SubRedditData) {
         viewModelScope.launch { repository.deleteDbSubRedditData(subRedditData) }
-    }
-
-    enum class FragmentName {
-        SubRedditFragment, NewPostFragment
     }
 }

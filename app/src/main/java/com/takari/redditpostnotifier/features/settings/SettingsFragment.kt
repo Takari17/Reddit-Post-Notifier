@@ -11,17 +11,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.Fragment
-import com.takari.redditpostnotifier.App
+import androidx.fragment.app.viewModels
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.databinding.SettingsActivityBinding
 import com.takari.redditpostnotifier.features.reddit.newPost.service.NewPostService
-import com.takari.redditpostnotifier.utils.injectViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
 
-/*
-                android:label="@string/title_activity_settings"
-
- */
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
     companion object {
@@ -29,7 +26,7 @@ class SettingsFragment : Fragment() {
         const val TAG = "Settings Fragment"
     }
 
-    private val viewModel: SettingsViewModel by injectViewModel { App.applicationComponent().settingsViewModel }
+    private val viewModel: SettingsViewModel by viewModels()
     private val apiRequestRateDialog = ApiRequestRateDialog()
     private val binding by lazy { SettingsActivityBinding.inflate(layoutInflater) }
 

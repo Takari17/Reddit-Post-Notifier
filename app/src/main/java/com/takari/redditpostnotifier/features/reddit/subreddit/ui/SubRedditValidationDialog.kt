@@ -9,14 +9,15 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.core.animation.doOnEnd
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.databinding.ValidationDialogLayoutBinding
 import com.takari.redditpostnotifier.utils.ResponseState
-import com.takari.redditpostnotifier.utils.injectViewModel
 import com.takari.redditpostnotifier.features.reddit.SharedViewModel
 import com.takari.redditpostnotifier.features.reddit.SharedViewModel.Companion.LIMIT_REACHED
 import com.takari.redditpostnotifier.features.reddit.SharedViewModel.Companion.NO_CONNECTION
+import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
@@ -24,10 +25,10 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class SubRedditValidationDialog : AppCompatDialogFragment() {
 
-    private val viewModel: SharedViewModel by injectViewModel { App.applicationComponent().sharedViewModel } // do we need to scope our dependencies?
+    private val viewModel: SharedViewModel by viewModels()
     private lateinit var binding: ValidationDialogLayoutBinding
 
 

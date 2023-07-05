@@ -9,24 +9,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.takari.redditpostnotifier.App
-import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
 import com.takari.redditpostnotifier.databinding.FragmentObservingBinding
-import com.takari.redditpostnotifier.utils.injectViewModel
+import com.takari.redditpostnotifier.features.MainActivity
+import com.takari.redditpostnotifier.features.reddit.SharedViewModel
+import com.takari.redditpostnotifier.features.reddit.newPost.service.NewPostService
+import com.takari.redditpostnotifier.features.reddit.newPostHistory.NewPostAdapter
+import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
+import com.takari.redditpostnotifier.utils.logD
 import com.takari.redditpostnotifier.utils.openRedditPost
 import com.takari.redditpostnotifier.utils.prependBaseUrlIfCrossPost
-import com.takari.redditpostnotifier.features.reddit.SharedViewModel
-import com.takari.redditpostnotifier.features.reddit.newPostHistory.NewPostAdapter
-import com.takari.redditpostnotifier.features.reddit.newPost.service.NewPostService
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class NewPostFragment : Fragment() {
 
-    private val viewModel: SharedViewModel by injectViewModel { App.applicationComponent().sharedViewModel } // do we need to scope our dependencies?
+    companion object {
+        const val TAG = "New Post"
+    }
+
+    private val viewModel: SharedViewModel by activityViewModels()
     private val subIconAdapter = ChosenSubRedditAdapter()
     private val serviceIntent by lazy { Intent(context, NewPostService::class.java) }
     private lateinit var newPostAdapter: NewPostAdapter
@@ -45,7 +52,9 @@ class NewPostFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.stopObservingButton.setOnClickListener {
-            viewModel.switchContainers(SharedViewModel.FragmentName.SubRedditFragment)
+            val mainActivity: MainActivity = requireActivity() as MainActivity
+            mainActivity.switchToSubRedditFragment()
+
             requireContext().stopService(serviceIntent)
         }
 
@@ -137,10 +146,13 @@ class NewPostFragment : Fragment() {
                 })
 
             postDataService.onServiceDestroy = {
-                viewModel.switchContainers(SharedViewModel.FragmentName.SubRedditFragment)
+                val mainActivity: MainActivity = requireActivity() as MainActivity
+                mainActivity.switchToSubRedditFragment()
             }
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {}
+        override fun onServiceDisconnected(name: ComponentName?) {
+            logD("UNBINDED FROM SERVICE ---------------")
+        }
     }
 }

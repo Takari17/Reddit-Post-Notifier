@@ -12,36 +12,38 @@ import com.takari.redditpostnotifier.features.reddit.newPost.models.PostDataDao
 import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditDataDao
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
+@InstallIn(SingletonComponent::class)
 object ApplicationModule {
 
-    @JvmStatic
     @Provides
-    fun provideSharedPreferences(context: Context): SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+    }
 
-    @JvmStatic
     @Provides
-    fun provideRoomDb(context: Context): RoomDb =
-        Room.databaseBuilder(context, RoomDb::class.java, DB_NAME)
+    fun provideRoomDb(@ApplicationContext context: Context): RoomDb {
+        return Room.databaseBuilder(context, RoomDb::class.java, DB_NAME)
             .fallbackToDestructiveMigration()
             .build()
+    }
 
-    @JvmStatic
     @Provides
-    fun providePostDataDao(roomDb: RoomDb): PostDataDao =
-        roomDb.postDataDao
+    fun providePostDataDao(roomDb: RoomDb): PostDataDao {
+        return roomDb.postDataDao
+    }
 
-    @JvmStatic
     @Provides
-    fun provideSubRedditDataDao(roomDb: RoomDb): SubRedditDataDao =
-        roomDb.subRedditDataDao
+    fun provideSubRedditDataDao(roomDb: RoomDb): SubRedditDataDao {
+        return roomDb.subRedditDataDao
+    }
 
-
-    @JvmStatic
     @Provides
     fun provideRetrofit(): RedditApi {
         return Retrofit.Builder()
