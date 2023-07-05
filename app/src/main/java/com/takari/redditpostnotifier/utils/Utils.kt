@@ -22,8 +22,9 @@ inline fun <reified T : ViewModel> Fragment.injectViewModel(
     crossinline provider: () -> T
 ) = activityViewModels<T> {
     object : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-            provider() as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return provider() as T
+        }
     }
 }
 
@@ -35,8 +36,9 @@ inline fun <reified T : ViewModel> AppCompatActivity.injectViewModel(
     crossinline provider: () -> T
 ) = viewModels<T> {
     object : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-            provider() as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return provider() as T
+        }
     }
 }
 
@@ -52,4 +54,4 @@ fun prependBaseUrlIfCrossPost(postData: PostData) =
     if (postData.crossPostParentName != null) "${RedditApi.BASE_URL}${postData.sourceUrl}"
     else postData.sourceUrl
 
-fun logD(message: String?) = Log.d("zwi", message?:"")
+fun logD(message: String?) = Log.d("zwi", message ?: "")

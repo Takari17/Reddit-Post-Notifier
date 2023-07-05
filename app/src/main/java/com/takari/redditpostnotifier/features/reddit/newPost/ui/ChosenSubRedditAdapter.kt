@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.api.load
+import coil.load
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
 import com.takari.redditpostnotifier.databinding.IconAdapterLayoutBinding
