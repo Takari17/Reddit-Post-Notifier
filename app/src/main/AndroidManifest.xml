@@ -23,13 +23,6 @@
                 android:exported="true" />
 
         <activity
-                android:name="com.takari.redditpostnotifier.features.settings.SettingsActivity"
-                android:configChanges="orientation|keyboardHidden"
-                android:exported="true"
-                android:label="@string/title_activity_settings"
-                android:screenOrientation="fullSensor" />
-
-        <activity
                 android:name="com.takari.redditpostnotifier.features.reddit.subreddit.ui.MainActivity"
                 android:configChanges="orientation|keyboardHidden"
                 android:exported="true"

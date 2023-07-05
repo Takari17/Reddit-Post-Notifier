@@ -2,58 +2,98 @@ package com.takari.redditpostnotifier.features.settings
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.fragment.app.Fragment
 import com.takari.redditpostnotifier.App
+import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.databinding.SettingsActivityBinding
-import com.takari.redditpostnotifier.utils.injectViewModel
 import com.takari.redditpostnotifier.features.reddit.newPost.service.NewPostService
+import com.takari.redditpostnotifier.utils.injectViewModel
+import com.takari.redditpostnotifier.utils.logD
 import es.dmoral.toasty.Toasty
 
 /*
-Preference Settings was WAY too complicated and over engineered so I made my own implementation.
+                android:label="@string/title_activity_settings"
+
  */
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
 
     companion object {
         const val API_REQUEST_RATE_KEY = "apiRequestRate"
+        const val TAG = "Settings Fragment"
     }
 
     private val viewModel: SettingsViewModel by injectViewModel { App.applicationComponent().settingsViewModel }
     private val apiRequestRateDialog = ApiRequestRateDialog()
     private val binding by lazy { SettingsActivityBinding.inflate(layoutInflater) }
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        // Adds the back button to the action bar and changes it's name
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+        val supportActionBar = (requireActivity() as AppCompatActivity).supportActionBar
+
+        supportActionBar?.title = resources.getString(R.string.settings)
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        window.navigationBarColor = Color.parseColor("#171A23")
 
-        val initialApiRequestRate = viewModel.getIntFromSharedPrefs(API_REQUEST_RATE_KEY, 1)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val initialApiRequestRate = viewModel.getIntFromSharedPrefs(
+            API_REQUEST_RATE_KEY, 1
+        )
 
         binding.displayedApiRequestRateTextView.text = "Every $initialApiRequestRate min"
 
         binding.cardViewBackground.setOnClickListener {
             if (!apiRequestRateDialog.isAdded)
-                apiRequestRateDialog.show(supportFragmentManager, "ApiRequestRateDialog")
+                apiRequestRateDialog.show(
+                    requireActivity().supportFragmentManager,
+                    "ApiRequestRateDialog"
+                )
         }
 
         apiRequestRateDialog.onItemSelected = { apiRequestRateInMinutes ->
             binding.displayedApiRequestRateTextView.text = "Every $apiRequestRateInMinutes min"
-            viewModel.saveIntToSharedPrefs(API_REQUEST_RATE_KEY, apiRequestRateInMinutes)
+            viewModel.saveIntToSharedPrefs(
+                API_REQUEST_RATE_KEY,
+                apiRequestRateInMinutes
+            )
 
             if (NewPostService.isRunning())
-                Toasty.warning(this, "Stop observing to take effect", Toast.LENGTH_SHORT).show()
+                Toasty.warning(
+                    requireContext(),
+                    "Stop observing to take effect",
+                    Toast.LENGTH_SHORT
+                ).show()
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Reverts action bar
+        val supportActionBar = (requireActivity() as AppCompatActivity).supportActionBar
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
+        supportActionBar?.title = resources.getString(R.string.app_name)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        finish()
+        logD("IT WAS CLICKED---------")
+        requireActivity().supportFragmentManager.popBackStack()
         return super.onOptionsItemSelected(item)
     }
 

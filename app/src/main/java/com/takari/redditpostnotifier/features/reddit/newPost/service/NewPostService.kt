@@ -14,11 +14,11 @@ import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.App.Companion.applicationComponent
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.features.reddit.newPost.models.PostData
-import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
-import com.takari.redditpostnotifier.utils.logD
-import com.takari.redditpostnotifier.features.reddit.subreddit.ui.MainActivity
 import com.takari.redditpostnotifier.features.reddit.newPostHistory.PostHistoryActivity
-import com.takari.redditpostnotifier.features.settings.SettingsActivity
+import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
+import com.takari.redditpostnotifier.features.reddit.subreddit.ui.MainActivity
+import com.takari.redditpostnotifier.features.settings.SettingsFragment
+import com.takari.redditpostnotifier.utils.logD
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -35,7 +35,8 @@ class NewPostService : Service() {
     private val id = 2201
     private var newPostCounter = 0
     var onServiceDestroy: (() -> Unit) = {}
-    private val viewedPost: MutableList<PostData> = mutableListOf() //used for filtering new post from old
+    private val viewedPost: MutableList<PostData> =
+        mutableListOf() //used for filtering new post from old
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val currentTime = MutableLiveData("0")
 
@@ -70,7 +71,7 @@ class NewPostService : Service() {
         subRedditDataList.forEach { subNames.add(it.name) }
 
         val apiRequestRateInMillis: Long = repository.getIntFromSharedPrefs(
-            key = SettingsActivity.API_REQUEST_RATE_KEY,
+            key = SettingsFragment.API_REQUEST_RATE_KEY,
             defaultValue = 1
         ).toLong().toMilli()
 
