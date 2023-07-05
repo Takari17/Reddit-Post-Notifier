@@ -1,10 +1,10 @@
 package com.takari.redditpostnotifier.di
 
 import android.content.Context
-import com.takari.redditpostnotifier.data.misc.Repository
-import com.takari.redditpostnotifier.ui.history.PostHistoryViewModel
-import com.takari.redditpostnotifier.ui.common.SharedViewModel
-import com.takari.redditpostnotifier.ui.settings.SettingsViewModel
+import com.takari.redditpostnotifier.features.reddit.data.Repository
+import com.takari.redditpostnotifier.features.reddit.newPostHistory.PostHistoryViewModel
+import com.takari.redditpostnotifier.features.reddit.SharedViewModel
+import com.takari.redditpostnotifier.features.settings.SettingsViewModel
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

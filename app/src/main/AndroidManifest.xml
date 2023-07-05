@@ -19,18 +19,18 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
-                android:name="com.takari.redditpostnotifier.ui.history.PostHistoryActivity"
+                android:name="com.takari.redditpostnotifier.features.reddit.newPostHistory.PostHistoryActivity"
                 android:exported="true" />
 
         <activity
-                android:name="com.takari.redditpostnotifier.ui.settings.SettingsActivity"
+                android:name="com.takari.redditpostnotifier.features.settings.SettingsActivity"
                 android:configChanges="orientation|keyboardHidden"
                 android:exported="true"
                 android:label="@string/title_activity_settings"
                 android:screenOrientation="fullSensor" />
 
         <activity
-                android:name="com.takari.redditpostnotifier.ui.common.MainActivity"
+                android:name="com.takari.redditpostnotifier.features.reddit.subreddit.ui.MainActivity"
                 android:configChanges="orientation|keyboardHidden"
                 android:exported="true"
                 android:launchMode="singleTop"
@@ -45,8 +45,8 @@
 
         </activity>
 
-        <service android:name="com.takari.redditpostnotifier.ui.post.service.NewPostService" />
-        <receiver android:name="com.takari.redditpostnotifier.ui.post.service.NewPostReceiver" />
+        <service android:name="com.takari.redditpostnotifier.features.reddit.newPost.service.NewPostService" />
+        <receiver android:name="com.takari.redditpostnotifier.features.reddit.newPost.service.NewPostReceiver" />
 
     </application>
 

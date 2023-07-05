@@ -5,7 +5,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.subreddit.ui.SubRedditFragment"
+        tools:context=".features.reddit.subreddit.ui.SubRedditFragment"
         android:id="@+id/subRedditFragment">
 
 
