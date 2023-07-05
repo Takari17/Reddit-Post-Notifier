@@ -5,9 +5,9 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -76,15 +76,24 @@ class SubRedditFragment : Fragment() {
 
             //without a delay the recycler view wouldn't scroll to the new item for whatever reason
             handler.postDelayed({
-                queuedSubRedditRecyclerView
-                    .smoothScrollToPosition(0)
+                queuedSubRedditRecyclerView.smoothScrollToPosition(0)
             }, 500)
 
-            //disabled if there's no data in the db
-            binding.observeButton.isEnabled = subRedditDataList.isNotEmpty()
-
             //will be received by NewPostFragment
+            //todo fix this
             viewModel.subRedditDataList = subRedditDataList
+
+            if (subRedditDataList.isEmpty()) {
+                binding.observeButton.isEnabled = false
+                binding.observeButton.backgroundTintList = ContextCompat.getColorStateList(
+                    requireContext(), R.color.colorSecondaryDark
+                )
+            } else {
+                binding.observeButton.isEnabled = true
+                binding.observeButton.backgroundTintList = ContextCompat.getColorStateList(
+                    requireContext(), R.color.colorAccent
+                )
+            }
         })
     }
 }
