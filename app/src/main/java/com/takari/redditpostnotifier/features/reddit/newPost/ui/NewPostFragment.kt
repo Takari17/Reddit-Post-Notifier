@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,7 +37,6 @@ class NewPostFragment : Fragment() {
     private val serviceIntent by lazy { Intent(context, NewPostService::class.java) }
     private lateinit var newPostAdapter: NewPostAdapter
     private val binding by lazy { FragmentObservingBinding.inflate(layoutInflater) }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -140,19 +138,15 @@ class NewPostFragment : Fragment() {
             val postDataService = (service as NewPostService.LocalBinder).getService()
 
             //Service is already in the main thread
-            postDataService.observeCurrentTime()
-                .observe(viewLifecycleOwner, Observer { timeInSeconds ->
-                    binding.timerTextView.text = "Connecting In: $timeInSeconds secs"
-                })
-
-            postDataService.onServiceDestroy = {
-                val mainActivity: MainActivity = requireActivity() as MainActivity
-                mainActivity.switchToSubRedditFragment()
+            postDataService.observeCurrentTime().observe(viewLifecycleOwner) { timeInSeconds ->
+                binding.timerTextView.text = "Connecting In: $timeInSeconds secs"
             }
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             logD("UNBINDED FROM SERVICE ---------------")
+            val mainActivity: MainActivity = requireActivity() as MainActivity
+            mainActivity.switchToSubRedditFragment()
         }
     }
 }

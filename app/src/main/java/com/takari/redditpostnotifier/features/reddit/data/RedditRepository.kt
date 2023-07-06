@@ -16,41 +16,40 @@ import javax.inject.Singleton
 
 
 /**
- * One repositry is used instead of separeate repositories per module is because multiple modules are linked in terms of data.
- * For example newPost module depends on the subredits selected in the
- * subreddit module. And newPost history depends on the new post in newPost
- * module.
- *
-
+ * This class exposes methods for retrieving and storing data from the reddit API. This repository
+ * is shared across multiple modules because the data within the modules are linked to each other.
+ * For example, the newPost module depends on the subreddits selected in the subreddit module.
  */
 @Singleton
-class Repository @Inject constructor(
+class RedditRepository @Inject constructor(
     private val redditApi: RedditApi,
     private val postDataDao: PostDataDao,
     private val subRedditDataDao: SubRedditDataDao,
-    private val sharedPrefs: SharedPreferences //todo create a sepratre settings repository.
+    private val sharedPrefs: SharedPreferences
 ) {
 
-    //Goes through a list of subRedditNames and retrieves the newest post for each of them
-    suspend fun getPostList(vararg subName: String): Flow<List<Post>> = flow {
+    /**
+     * Iterates through a list of subreddits and retrieves the newest post for each of them.
+     */
+    suspend fun getNewPostList(vararg subName: String): Flow<List<Post>> = flow {
         subName.forEach { name ->
             val postList = redditApi.getNewPostList(name).data.children
             emit(postList)
         }
     }
 
-    /**
-     * TODO write docs here
-     */
     suspend fun getSubRedditData(name: String): SubRedditData {
         return redditApi.getSubRedditData(name).data
     }
 
-    suspend fun insertPostDataInDb(post: PostData) = withContext(Dispatchers.Default) {
+    suspend fun insertPostData(post: PostData) = withContext(Dispatchers.Default) {
         postDataDao.insertReplace(post)
     }
 
-    fun listenToPostDataInDb(): Flow<List<PostData>> {
+    /**
+     * Listens for changes to PostData in the local Room DB.
+     */
+    fun observePostData(): Flow<List<PostData>> {
         return postDataDao.listenForPostData()
     }
 
@@ -58,7 +57,7 @@ class Repository @Inject constructor(
         return postDataDao.deleteItem(postData)
     }
 
-    suspend fun deleteAllDbPostData(): Unit {
+    suspend fun deleteAllDbPostData() {
         postDataDao.deleteAll()
     }
 
@@ -78,10 +77,9 @@ class Repository @Inject constructor(
         subRedditDataDao.deleteItem(subRedditData)
     }
 
-    fun getIntFromSharedPrefs(key: String, defaultValue: Int): Int =
-        sharedPrefs.getInt(key, defaultValue)
+    fun getApiRequestRate(): Int = sharedPrefs.getInt("apiRequestRate", 1)
 
-    fun saveIntToSharedPrefs(key: String, value: Int) {
-        sharedPrefs.edit { putInt(key, value) }
+    fun saveApiRequestRate(value: Int) {
+        sharedPrefs.edit { putInt("apiRequestRate", value) }
     }
 }

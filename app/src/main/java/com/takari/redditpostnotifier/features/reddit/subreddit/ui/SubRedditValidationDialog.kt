@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.core.animation.doOnEnd
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import com.takari.redditpostnotifier.App
@@ -28,7 +29,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SubRedditValidationDialog : AppCompatDialogFragment() {
 
-    private val viewModel: SharedViewModel by viewModels()
+    private val viewModel: SharedViewModel by activityViewModels()
     private lateinit var binding: ValidationDialogLayoutBinding
 
 

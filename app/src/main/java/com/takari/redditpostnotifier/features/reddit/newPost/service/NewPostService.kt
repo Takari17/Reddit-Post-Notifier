@@ -14,10 +14,9 @@ import androidx.lifecycle.MutableLiveData
 import com.takari.redditpostnotifier.App
 import com.takari.redditpostnotifier.R
 import com.takari.redditpostnotifier.features.MainActivity
-import com.takari.redditpostnotifier.features.reddit.data.Repository
+import com.takari.redditpostnotifier.features.reddit.data.RedditRepository
 import com.takari.redditpostnotifier.features.reddit.newPost.models.PostData
 import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
-import com.takari.redditpostnotifier.features.settings.SettingsFragment
 import com.takari.redditpostnotifier.utils.logD
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -42,17 +41,17 @@ class NewPostService : Service() {
 
     companion object {
         fun isRunning() = running
+
         const val RESET = "reset"
     }
 
     @Inject
-    lateinit var repository: Repository
+    lateinit var repository: RedditRepository
 
-    private val id = 2201
     private var newPostCounter = 0
-    var onServiceDestroy: (() -> Unit) = {}
-    private val viewedPost: MutableList<PostData> =
-        mutableListOf() //used for filtering new post from old
+
+    //used for filtering new post from old
+    private val viewedPost: MutableList<PostData> =   mutableListOf()
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val currentTime = MutableLiveData("0")
     private val notificationBuilder by lazy { NotificationCompat.Builder(this, App.CHANNEL_ID) }
@@ -71,9 +70,7 @@ class NewPostService : Service() {
         return LocalBinder()
     }
 
-    /*Only invoked on initialization and on reset.*/
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
         logD("SERVICE STARTED ----------------------------------------")
 
         if (intent!!.action == RESET) {
@@ -87,10 +84,7 @@ class NewPostService : Service() {
         val subNames = mutableListOf<String>()
         subRedditDataList.forEach { subNames.add(it.name) }
 
-        val apiRequestRateInMillis: Long = repository.getIntFromSharedPrefs(
-            key = SettingsFragment.API_REQUEST_RATE_KEY,
-            defaultValue = 1
-        ).toLong().toMilli()
+        val apiRequestRateInMillis: Long = repository.getApiRequestRate().toLong().toMilli()
 
         saveInitialPostInList(subNames.toTypedArray())
 
@@ -109,7 +103,7 @@ class NewPostService : Service() {
             setOnlyAlertOnce(true)
         }.build()
 
-        startForeground(id, notification)
+        startForeground(101, notification)
 
         return START_REDELIVER_INTENT
     }
@@ -119,7 +113,6 @@ class NewPostService : Service() {
         logD("SERVICE DESTROYED --------------------------------------------")
         running = false
         scope.cancel()
-        onServiceDestroy()
     }
 
     private fun destroyService() {
@@ -130,13 +123,12 @@ class NewPostService : Service() {
     //Used for future filtering comparisons. Filters through a long list so Dispatchers.Default is used
     private fun saveInitialPostInList(subNames: Array<String>) {
         scope.launch {
-            repository.getPostList(*subNames)
+            repository.getNewPostList(*subNames)
                 .flowOn(Dispatchers.Default)
                 .collect { postList -> postList.forEach { post -> viewedPost.add(post.data) } }
         }
     }
 
-    //Don't have to call stop bc it'll be destroyed when the scope clears.
     private fun flowRepeatingCountDownTimer(startingMillis: Long) = flow {
         var currentTime = startingMillis
         while (true) {
@@ -158,7 +150,7 @@ class NewPostService : Service() {
                     it
                 }
                 .filter { it == "0" }
-                .flatMapMerge { repository.getPostList(*subNames) }
+                .flatMapMerge { repository.getNewPostList(*subNames) }
                 .flatMapMerge { it.asFlow() }
                 .filter { it.data !in viewedPost }
                 .catch { logD(it.message) }
@@ -167,7 +159,7 @@ class NewPostService : Service() {
                     viewedPost.add(post.data)
                     newPostCounter++
                     updateNewPostNotification(post.data, newPostCounter)
-                    repository.insertPostDataInDb(post.data)
+                    repository.insertPostData(post.data)
                 }
         }
     }
@@ -200,25 +192,21 @@ class NewPostService : Service() {
     private fun updateNotificationTimer(timeInSeconds: String) {
         notificationBuilder.setContentText("Connecting in: $timeInSeconds seconds")
 
-        notificationManager.notify(id, notificationBuilder.build())
+        notificationManager.notify(101, notificationBuilder.build())
     }
 
     private fun updateNewPostNotification(postData: PostData, newPostCounter: Int) {
         val newNotification = getFoundPostNotification(postData, newPostCounter)
-        notificationManager.notify(238, newNotification)
+        notificationManager.notify(202, newNotification)
     }
 
     private val resetIntent: PendingIntent by lazy {
         val receiverIntent = Intent(this, NewPostReceiver::class.java).apply {
             action = RESET
         }
+
         PendingIntent.getBroadcast(this, 2, receiverIntent, PendingIntent.FLAG_IMMUTABLE)
     }
-
-//    private val postHistoryIntent: PendingIntent by lazy {
-//        val intent = Intent(this, PostHistoryActivity::class.java)
-//        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-//    }
 
     private val activityIntent: PendingIntent by lazy {
         val intent = Intent(this, MainActivity::class.java)

@@ -67,62 +67,42 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.material:material:1.9.0'
 
-    //androidx.test
-    androidTestImplementation "androidx.test:runner:1.5.2"
-    androidTestImplementation "androidx.test:core:1.5.0"
-    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.5"
-
-    //JUnit 5
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.5.1'
-
-    //Espresso
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
-    androidTestImplementation "androidx.test.espresso:espresso-contrib:3.5.1"
-    implementation "androidx.test.espresso:espresso-idling-resource:3.5.1"
-
-    //Mockk
-    testImplementation "io.mockk:mockk:1.9.3"
-    androidTestImplementation "io.mockk:mockk-android:1.9.3"
-
-    //Toasty
+    // Toasty
     implementation 'com.github.GrenderG:Toasty:1.4.2'
 
-    //ViewModel and LiveData
+    // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
 
-    //Coroutines
+    // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
 
-    //Room and Coroutine support
+    // Room and Coroutine support
     implementation "androidx.room:room-runtime:2.5.2"
     kapt "androidx.room:room-compiler:2.5.2"
     implementation "androidx.room:room-ktx:2.5.2"
 
-    //Retrofit
+    // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 
-    //GSON Converter
+    // GSON Converter
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 
     // Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.44.2")
     kapt("com.google.dagger:hilt-android-compiler:2.44.2")
 
-    //KTX
+    // KTX
     implementation 'androidx.fragment:fragment-ktx:1.6.0'
     implementation 'androidx.activity:activity-ktx:1.7.2'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
 
-    //Android-SpinKit
+    // Android-SpinKit
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
-    //Lottie
+    // Lottie
     implementation 'com.airbnb.android:lottie:3.3.1'
 
-    //Coil
+    // Coil
     implementation("io.coil-kt:coil:2.4.0")
 }

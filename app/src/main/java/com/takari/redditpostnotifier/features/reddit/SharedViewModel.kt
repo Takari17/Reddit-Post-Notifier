@@ -3,7 +3,7 @@ package com.takari.redditpostnotifier.features.reddit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.takari.redditpostnotifier.features.reddit.data.Repository
+import com.takari.redditpostnotifier.features.reddit.data.RedditRepository
 import com.takari.redditpostnotifier.features.reddit.newPost.models.PostData
 import com.takari.redditpostnotifier.features.reddit.subreddit.models.SubRedditData
 import com.takari.redditpostnotifier.utils.ResponseState
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 //The Views pretty much only rely off of the state of the local db.
 @HiltViewModel
-class SharedViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class SharedViewModel @Inject constructor(private val repository: RedditRepository) : ViewModel() {
 
     companion object {
         const val LIMIT_REACHED = "Limit Reached" //todo string resource
@@ -28,7 +28,7 @@ class SharedViewModel @Inject constructor(private val repository: Repository) : 
     var subRedditDataList: List<SubRedditData>? = null
 
     val dbPostData = liveData {
-        repository.listenToPostDataInDb()
+        repository.observePostData()
             .collect { postDataList -> emit(postDataList) }
     }
 

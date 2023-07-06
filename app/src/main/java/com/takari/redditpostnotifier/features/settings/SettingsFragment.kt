@@ -22,7 +22,6 @@ import es.dmoral.toasty.Toasty
 class SettingsFragment : Fragment() {
 
     companion object {
-        const val API_REQUEST_RATE_KEY = "apiRequestRate"
         const val TAG = "Settings Fragment"
     }
 
@@ -49,9 +48,7 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val initialApiRequestRate = viewModel.getIntFromSharedPrefs(
-            API_REQUEST_RATE_KEY, 1
-        )
+        val initialApiRequestRate = viewModel.getApiRequestRate()
 
         binding.displayedApiRequestRateTextView.text = "Every $initialApiRequestRate min"
 
@@ -65,10 +62,7 @@ class SettingsFragment : Fragment() {
 
         apiRequestRateDialog.onItemSelected = { apiRequestRateInMinutes ->
             binding.displayedApiRequestRateTextView.text = "Every $apiRequestRateInMinutes min"
-            viewModel.saveIntToSharedPrefs(
-                API_REQUEST_RATE_KEY,
-                apiRequestRateInMinutes
-            )
+            viewModel.saveApiRequestRate(apiRequestRateInMinutes)
 
             if (NewPostService.isRunning())
                 Toasty.warning(

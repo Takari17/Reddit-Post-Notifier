@@ -32,6 +32,8 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="32dp"
             android:text="Delete All"
+            android:backgroundTint="@color/colorAccent"
+            android:textColor="#FFFFFF"
             app:layout_constraintBottom_toTopOf="@+id/nothingFoundIcon"
             app:layout_constraintEnd_toStartOf="@+id/guideline14"
             app:layout_constraintStart_toStartOf="@+id/guideline15"
