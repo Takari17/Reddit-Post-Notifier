@@ -11,39 +11,26 @@ Reddit Post Notifier keeps you up to date with post from your favorite communiti
 <img src= "preview/post_notifier_feature_graphic.png"/>
 </p>
 
-
 ## Download
 You can download it from the release [right here.](https://github.com/That1guy17/Reddit-Post-Notifier/releases)
 
 <img src="/preview/preview_gif.gif" align="right" width="32%"/>
 
 ## Tech stack & Open-source libraries
-- Minimum SDK level 21
-- Kotlin based
-- Architecture
-  - MVVM Architecture (View - ViewModel - Model)
-  - Repository pattern
-- [Dagger2](https://dagger.dev/) - handles dependency injection/management.
+- Built 100% using Kotlin
+- [Dagger Hilt](https://developer.android.com/training/dependency-injection/hilt-android) - Reduces the boilerplate of doing manual dependency injection in your project.
 - [Retrofit2 & OkHttp3](https://github.com/square/retrofit) - abstracts complexity of REST API communication.
-  - [GSON Converter](https://github.com/square/retrofit/tree/master/retrofit-converters/gson) - handles serialization and deserialization to and from JSON.
-  - ~[Rx Call Adapter Factory](https://github.com/square/retrofit/tree/master/retrofit-adapters/rxjava2) - allows Retrofit to return RxJava Observables.~
-- ~[RxJava](https://github.com/ReactiveX/RxJava) - used for composing asynchronous and event based operations. Also handles multi-threading.~
-  - ~[RxKotlin](https://github.com/ReactiveX/RxKotlin) - adds new Kotlin extension functions.~
-  - ~[RxAndroid](https://github.com/ReactiveX/RxAndroid) - gives Schedulers access to the MainThread.~
-  - ~[RxBindings](https://github.com/JakeWharton/RxBinding) - Binds UI widgets to Observables.~
-  - ~[RxRelay](https://github.com/JakeWharton/RxRelay) - adds Relays which are essentially Subjects without termination events.~
-- [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) - used for reducing the complexity of asynchronous code and concurrency.
-- [Kotlin Flow](https://kotlinlang.org/docs/reference/coroutines/flow.html) - used for simplistic cold observables
+- [GSON Converter](https://github.com/square/retrofit/tree/master/retrofit-converters/gson) - for JSON serialization and deserialization.
+- [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) - Simplifies the the complexity of asynchronous programs.
+- [Coil](https://coil-kt.github.io/coil/) - An image loading library for Android backed by Kotlin Coroutines.
+- [Kotlin Flow](https://kotlinlang.org/docs/reference/coroutines/flow.html) - used for cold observables,
 - [Toasty](https://github.com/GrenderG/Toasty) - creates beautiful custom made Toast with background colors, icons, etc.
 - [Room](https://developer.android.com/training/data-storage/room) - abstracts the complexity of managing SQL databases
-- [Android KTX](https://developer.android.com/kotlin/ktx) - a set of Kotlin extensions.
 - [Android-SpinKit](https://github.com/ybq/Android-SpinKit) - gives access to an array of loading views.
 - [Lottie](https://airbnb.io/lottie/#/android) - gives access to many user created animations.
-- [Fancy Buttons](https://github.com/medyo/fancybuttons) - gives access to beautiful custom made buttons.
-- [Coil](https://github.com/coil-kt/coil) - a Kotlin focused image loading library.
 
 ## Architecture
-Reddit Post Notifier is based on MVVM architecture and the Repository pattern. I omitted using Live Data since it's essentially just a Behavior Subject/Relay from RxJava.
+Reddit Post Notifier is built based on the MVVM architecture and the Repository pattern. 
 
 ![architecture](https://cdn-images-1.medium.com/max/1200/1*KnYBBZIDDeg4zVDDEcLw2A.png)
 
