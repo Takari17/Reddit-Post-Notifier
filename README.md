@@ -26,8 +26,7 @@ You can download it directly from Google Play [right here.](https://play.google.
 - [Kotlin Flow](https://kotlinlang.org/docs/reference/coroutines/flow.html) - used for cold observables,
 - [Toasty](https://github.com/GrenderG/Toasty) - creates beautiful custom made Toast with background colors, icons, etc.
 - [Room](https://developer.android.com/training/data-storage/room) - abstracts the complexity of managing SQL databases
-- [Android-SpinKit](https://github.com/ybq/Android-SpinKit) - gives access to an array of loading views.
-- [Lottie](https://airbnb.io/lottie/#/android) - gives access to many user created animations.
+- [Lottie](https://airbnb.io/lottie/#/android) - provides access to an array of user created animations.
 
 ## Architecture
 Reddit Post Notifier is built based on the MVVM architecture and the Repository pattern. 
