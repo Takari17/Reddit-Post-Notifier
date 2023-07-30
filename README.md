@@ -12,7 +12,7 @@ Reddit Post Notifier keeps you up to date with post from your favorite communiti
 </p>
 
 ## Download
-You can download it from the release [right here.](https://github.com/That1guy17/Reddit-Post-Notifier/releases)
+You can download it directly from Google Play [right here.](https://play.google.com/store/apps/details?id=com.harrison.redditpostnotifier)
 
 <img src="/preview/preview_gif.gif" align="right" width="32%"/>
 
